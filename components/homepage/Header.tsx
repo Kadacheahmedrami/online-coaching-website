@@ -63,10 +63,8 @@ export default function Header() {
             { href: "/success-stories", text: "Success Stories", delay: "delay-300" },
             { href: "/about", text: "About", delay: "delay-400" },
             { href: "/free-training", text: "Free Training", delay: "delay-500" },
-            { href: "/strategy-session", text: "Strategy Session", delay: "delay-600" },
             { href: "/blog", text: "Blog", delay: "delay-700" },
-            { href: "/faq", text: "FAQ", delay: "delay-800" },
-            { href: "/contact", text: "Contact", delay: "delay-900" }
+        
           ].map((item, index) => (
             <a 
               key={index}
