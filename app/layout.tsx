@@ -9,7 +9,7 @@ import Footer from "@/components/homepage/Footer"
 
 export const metadata: Metadata = {
   title: 'Hamza Gym',
-  description: 'Created with v0',
+  description: 'online coasing and fitness training',
 
 }
 
