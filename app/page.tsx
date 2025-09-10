@@ -14,7 +14,7 @@ import Header from "@/components/homepage/Header"
 export default function HamazaGymLanding() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10">
-         <Header />
+      
       <HeroSection />
       <SuccessStories />
       <AboutSection />

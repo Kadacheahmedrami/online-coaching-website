@@ -1,530 +1,321 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import {
-  Star,
-  Trophy,
-  Target,
-  Calendar,
-  ArrowRight,
-  Quote,
-  TrendingUp,
-  Award,
-  Heart,
-  Zap,
-  CheckCircle,
-  Play,
-} from "lucide-react"
-import { useState } from "react"
+import { ArrowRight, Eye } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import StrategySession from "@/components/homepage/StrategySession"
 
-export default function SuccessStoriesPage() {
-  const [showTransformation, setShowTransformation] = useState({ left: false, right: false })
+export default function ElegantSuccessStories() {
+  const [activeStories, setActiveStories] = useState<{[key: number]: boolean}>({})
+  const [isVisible, setIsVisible] = useState(false)
+  const [visibleCards, setVisibleCards] = useState<{[key: number]: boolean}>({})
+  const sectionRef = useRef<HTMLElement>(null)
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
 
-  const successStories = [
+  const stories = [
     {
-      name: "Sarah Johnson",
-      achievement: "Lost 25 lbs in 3 months",
-      beforeWeight: "165 lbs",
-      afterWeight: "140 lbs",
-      timeframe: "3 months",
-      testimonial:
-        "Hamaza Gym transformed my entire approach to fitness. The trainers are incredible and the results speak for themselves! I never thought I could achieve this level of fitness, but with Hamza's guidance, I not only lost weight but gained confidence and energy I never knew I had.",
-      goals: ["Weight Loss", "Increased Energy", "Better Sleep"],
-      rating: 5,
+      id: 1,
+      name: "Fat Loss Transformation",
+      achievement: "Lost 25kg in 4 months",
+      beforeImage: "/transformations/before-body1.png",
+      afterImage: "/transformations/after-body1.png",
+      stats: "25kg Lost • 12% Body Fat Reduced",
+      testimonial: "The program completely changed my relationship with food and exercise. I feel stronger and more confident than ever before."
     },
     {
-      name: "Mike Chen",
-      achievement: "Gained 15 lbs muscle",
-      beforeWeight: "155 lbs",
-      afterWeight: "170 lbs",
-      timeframe: "4 months",
-      testimonial:
-        "Best investment I've made for my health. The community here is amazing and keeps me motivated every day. Hamza's personalized approach helped me build muscle I never thought possible while maintaining a busy work schedule.",
-      goals: ["Muscle Gain", "Strength Building", "Better Physique"],
-      rating: 5,
+      id: 2,
+      name: "Muscle Building Journey", 
+      achievement: "Gained 15kg muscle mass",
+      beforeImage: "/transformations/before-body2.png",
+      afterImage: "/transformations/after-body2.png", 
+      stats: "15kg Muscle Gained • 65kg to 80kg",
+      testimonial: "From skinny to strong - this transformation taught me that consistency and proper guidance can achieve anything."
     },
     {
-      name: "Emma Davis",
-      achievement: "Completed first marathon",
-      beforeWeight: "N/A",
-      afterWeight: "N/A",
-      timeframe: "6 months",
-      testimonial:
-        "The facilities are world-class and the atmosphere is incredibly motivating. I actually look forward to workouts! From barely being able to run a mile to completing my first marathon - this journey has been life-changing.",
-      goals: ["Endurance Training", "Marathon Completion", "Cardiovascular Health"],
-      rating: 5,
+      id: 3,
+      name: "Strength & Conditioning",
+      achievement: "Doubled lifting capacity",
+      beforeImage: "/transformations/before-body3.png",
+      afterImage: "/transformations/after-body3.png",
+      stats: "100% Strength Increase • 6 Months",
+      testimonial: "Not only did I get stronger physically, but mentally too. This program gave me discipline that extends to all areas of my life."
     },
     {
-      name: "David Rodriguez",
-      achievement: "Lost 40 lbs, reversed diabetes",
-      beforeWeight: "220 lbs",
-      afterWeight: "180 lbs",
-      timeframe: "8 months",
-      testimonial:
-        "Hamza didn't just help me lose weight - he helped me reclaim my health. My doctor was amazed at my blood work improvements. The nutrition guidance was just as important as the workouts.",
-      goals: ["Weight Loss", "Health Improvement", "Diabetes Management"],
-      rating: 5,
+      id: 4,
+      name: "Complete Body Recomposition",
+      achievement: "Lost 18kg fat, gained 8kg muscle",
+      beforeImage: "/transformations/before-body4.png",
+      afterImage: "/transformations/after-body4.png",
+      stats: "18kg Fat Lost • 8kg Muscle Gained • 8 Months",
+      testimonial: "Amazing how my body completely transformed while eating more than I ever did before. Science-based approach really works."
     },
     {
-      name: "Lisa Thompson",
-      achievement: "Gained strength after injury",
-      beforeWeight: "N/A",
-      afterWeight: "N/A",
-      timeframe: "5 months",
-      testimonial:
-        "After my back injury, I thought my active days were over. Hamza's expertise in corrective exercise helped me not only recover but become stronger than before. His patience and knowledge made all the difference.",
-      goals: ["Injury Recovery", "Strength Building", "Pain Management"],
-      rating: 5,
+      id: 5,
+      name: "Athletic Performance",
+      achievement: "Increased performance by 200%",
+      beforeImage: "/transformations/before-body5.png",
+      afterImage: "/transformations/after-body5.png",
+      stats: "200% Performance Increase • Marathon Ready",
+      testimonial: "From couch to marathon in 10 months. The structured approach made what seemed impossible become achievable."
     },
     {
-      name: "James Wilson",
-      achievement: "Transformed at age 45",
-      beforeWeight: "195 lbs",
-      afterWeight: "175 lbs",
-      timeframe: "6 months",
-      testimonial:
-        "I thought it was too late to get in shape at 45, but Hamza proved me wrong. His age-appropriate training methods helped me achieve the best shape of my life while respecting my body's limitations.",
-      goals: ["Weight Loss", "Muscle Toning", "Age-Appropriate Fitness"],
-      rating: 5,
-    },
+      id: 6,
+      name: "Senior Fitness Revival",
+      achievement: "Regained strength at age 55",
+      beforeImage: "/transformations/before-body6.png",
+      afterImage: "/transformations/after-body6.png",
+      stats: "Age 55 • 20kg Lost • Strength Doubled",
+      testimonial: "Proof that age is just a number. I'm in better shape now than I was 20 years ago."
+    }
   ]
 
-  const stats = [
-    { number: "500+", label: "Success Stories", icon: Trophy },
-    { number: "95%", label: "Goal Achievement Rate", icon: Target },
-    { number: "10+", label: "Years Experience", icon: Award },
-    { number: "24/7", label: "Support Available", icon: Heart },
-  ]
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '-50px'
+      }
+    );
 
-  const handleTransformationReveal = (side: "left" | "right") => {
-    setShowTransformation((prev) => ({ ...prev, [side]: true }))
-  }
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const cardObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const cardId = parseInt(entry.target.getAttribute('data-card-id') || '0');
+            setVisibleCards(prev => ({
+              ...prev,
+              [cardId]: true
+            }));
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '-20px'
+      }
+    );
+
+    cardRefs.current.forEach((ref) => {
+      if (ref) cardObserver.observe(ref);
+    });
+
+    return () => cardObserver.disconnect();
+  }, []);
+
+  const toggleStory = (storyId: number) => {
+    setActiveStories(prev => ({
+      ...prev,
+      [storyId]: !prev[storyId]
+    }));
+  };
+
+  const navigateToTransformation = (transformationId: number) => {
+    // Navigate to the transformation detail page
+    window.location.href = `/success-stories/${transformationId}`;
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-16 sm:py-20 md:py-24 lg:py-32">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="text-center space-y-6">
-            <div className="inline-flex items-center px-3 py-1.5 bg-primary text-primary-foreground rounded-full text-xs font-medium">
-              <Trophy className="w-3 h-3 mr-1.5" />
-              Real Results from Real People
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-balance tracking-tight text-foreground">
-              Success <span className="text-accent">Stories</span>
-            </h1>
-
-            <p className="text-lg sm:text-xl text-muted-foreground text-pretty max-w-3xl mx-auto leading-relaxed">
-              Discover inspiring transformations from our community members. See how personalized training, expert
-              guidance, and unwavering support have helped hundreds achieve their fitness goals.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="!bg-black !text-white hover:!bg-gray-800">
-                <Calendar className="mr-2 h-5 w-5" />
-                Start Your Transformation
-              </Button>
-              <Button size="lg" variant="outline" className="bg-transparent">
-                <TrendingUp className="mr-2 h-5 w-5" />
-                View All Results
-              </Button>
-            </div>
-          </div>
+      <section className="py-16 md:py-24 relative overflow-hidden">
+        <div className="container mx-auto px-4 md:px-6 max-w-6xl text-center relative z-10">
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight">
+            Success
+            <span className="text-accent"> Stories</span>
+          </h1>
+          <p className="text-lg md:text-xl text-slate-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            Real transformations from real people. See before/after photos and discover what's possible.
+          </p>
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 bg-gradient-to-r from-accent/5 via-background to-accent/5">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-balance mb-4 tracking-tight text-foreground">
-              Featured <span className="text-accent">Transformations</span>
-            </h2>
-            <p className="text-lg text-muted-foreground text-pretty max-w-3xl mx-auto leading-relaxed">
-              Witness incredible before and after transformations. Click to reveal the amazing results!
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-            {/* Fat to Lean Transformation - Left */}
-            <div className="space-y-6">
-              <div className="text-center">
-                <h3 className="text-xl font-bold text-foreground mb-2">Fat Loss Journey</h3>
-                <p className="text-muted-foreground">Sarah's incredible 40lb weight loss transformation</p>
-              </div>
-
-              <Card className="relative overflow-hidden border-2 border-accent/20 bg-card shadow-xl">
-                <CardContent className="p-0">
-                  <div className="relative aspect-[4/5] bg-gradient-to-br from-red-50 to-red-100">
-                    {/* Before Image */}
-                    <div
-                      className={`absolute inset-0 transition-all duration-1000 ${showTransformation.left ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
-                    >
-                      <div className="w-full h-full bg-gradient-to-br from-red-100 to-red-200 flex items-center justify-center">
-                        <div className="text-center space-y-4">
-                          <div className="w-32 h-32 bg-red-300 rounded-full mx-auto flex items-center justify-center">
-                            <span className="text-4xl">😔</span>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="text-lg font-semibold text-red-800">BEFORE</div>
-                            <div className="text-sm text-red-600">185 lbs • Low Energy • Unhappy</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* After Image */}
-                    <div
-                      className={`absolute inset-0 transition-all duration-1000 ${showTransformation.left ? "opacity-100 scale-100" : "opacity-0 scale-105"}`}
-                    >
-                      <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
-                        <div className="text-center space-y-4">
-                          <div className="w-32 h-32 bg-green-300 rounded-full mx-auto flex items-center justify-center">
-                            <span className="text-4xl">💪</span>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="text-lg font-semibold text-green-800">AFTER</div>
-                            <div className="text-sm text-green-600">145 lbs • High Energy • Confident</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Reveal Button */}
-                    {!showTransformation.left && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Button
-                          onClick={() => handleTransformationReveal("left")}
-                          size="lg"
-                          className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-2xl animate-pulse"
+      {/* Transformations in Rows */}
+      <section 
+        ref={sectionRef}
+        className={`py-16 transition-all duration-1000 transform ${
+          isVisible 
+            ? 'opacity-100 translate-y-0' 
+            : 'opacity-0 translate-y-12'
+        }`}
+      >
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="space-y-16">
+            {stories.map((story, index) => {
+              const isActive = activeStories[story.id] || false;
+              const isCardVisible = visibleCards[story.id] || false;
+              
+              return (
+                <div
+                  key={story.id}
+                  ref={el => { cardRefs.current[index] = el; }}
+                  data-card-id={story.id}
+                  id={`transformation-${story.id}`}
+                  className={`transition-all duration-700 transform ${
+                    isCardVisible 
+                      ? 'opacity-100 translate-y-0' 
+                      : 'opacity-0 translate-y-8'
+                  }`}
+                  style={{
+                    transitionDelay: `${index * 150}ms`
+                  }}
+                >
+                  {/* Row Layout - Alternating sides */}
+                  <div className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-8 lg:gap-12`}>
+                    
+                    {/* Image Side */}
+                    <div className="w-full lg:w-1/2">
+                      <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 overflow-hidden">
+                        <div 
+                          className="relative h-96 cursor-pointer group"
+                          onClick={() => toggleStory(story.id)}
                         >
-                          <Play className="mr-2 h-5 w-5" />
-                          Reveal Transformation
+                          {/* Before Image */}
+                          <img 
+                            src={story.beforeImage}
+                            alt={`${story.name} before`}
+                            className={`absolute inset-0 w-full h-full object-contain transition-all duration-700 group-hover:scale-105 ${
+                              isActive ? 'opacity-0' : 'opacity-100'
+                            }`}
+                          />
+
+                          {/* After Image */}
+                          <img 
+                            src={story.afterImage}
+                            alt={`${story.name} after`}
+                            className={`absolute inset-0 w-full h-full object-contain transition-all duration-700 group-hover:scale-105 ${
+                              isActive ? 'opacity-100' : 'opacity-0'
+                            }`}
+                          />
+
+                          {/* Before/After Labels */}
+                          <div className="absolute top-4 left-4">
+                            <span className={`bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full transition-all duration-500 ${
+                              isActive ? 'opacity-0 -translate-x-2' : 'opacity-100'
+                            }`}>
+                              Before
+                            </span>
+                            <span className={`absolute top-0 left-0 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full transition-all duration-500 ${
+                              isActive ? 'opacity-100' : 'opacity-0 translate-x-2'
+                            }`}>
+                              After
+                            </span>
+                          </div>
+
+                          {/* Click Indicator */}
+                          <div className="absolute top-4 right-4">
+                            <div className="bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+                              {isActive ? 'Show Before' : 'Show After'}
+                            </div>
+                          </div>
+
+                          {/* Hover Overlay */}
+                          <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <Eye className="w-8 h-8 text-white drop-shadow-lg" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Text Side */}
+                    <div className="w-full lg:w-1/2 space-y-6">
+                      <div>
+                        <h3 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-3">
+                          {story.name}
+                        </h3>
+                        <p className="text-xl text-slate-600 mb-4">
+                          {story.achievement}
+                        </p>
+                        <div className="text-sm text-slate-500 font-medium mb-6 bg-slate-100 px-4 py-2 rounded-lg inline-block">
+                          {story.stats}
+                        </div>
+                      </div>
+                      
+                      {/* Testimonial */}
+                      <blockquote className="text-lg text-slate-700 italic border-l-4 border-slate-300 pl-6 py-4 bg-slate-50 rounded-r-lg">
+                        "{story.testimonial}"
+                      </blockquote>
+                      
+                      {/* Action Buttons */}
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        {/* Reveal Button */}
+                        <Button 
+                          onClick={() => toggleStory(story.id)}
+                          size="lg"
+                          className={`transition-all duration-300 px-8 py-3 rounded-full ${
+                            isActive 
+                              ? 'bg-green-600 hover:bg-green-700' 
+                              : 'bg-slate-900 hover:bg-slate-800'
+                          }`}
+                        >
+                          <Eye className="w-5 h-5 mr-2" />
+                          {isActive ? 'Show Before Photo' : 'Show After Photo'}
+                        </Button>
+                        
+                        {/* See More Button */}
+                        <Button 
+                          onClick={() => navigateToTransformation(story.id)}
+                        
+                          size="lg"
+                          className="px-8 py-3 rounded-full border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400 transition-all duration-300"
+                        >
+                          See More Details
+                          <ArrowRight className="w-5 h-5 ml-2" />
                         </Button>
                       </div>
-                    )}
-
-                    {/* Celebration Effect */}
-                    {showTransformation.left && (
-                      <div className="absolute inset-0 pointer-events-none">
-                        <div className="absolute top-4 left-4 animate-bounce text-2xl">🎉</div>
-                        <div
-                          className="absolute top-8 right-6 animate-bounce text-2xl"
-                          style={{ animationDelay: "0.2s" }}
-                        >
-                          ✨
-                        </div>
-                        <div
-                          className="absolute bottom-12 left-8 animate-bounce text-2xl"
-                          style={{ animationDelay: "0.4s" }}
-                        >
-                          🔥
-                        </div>
-                        <div
-                          className="absolute bottom-6 right-4 animate-bounce text-2xl"
-                          style={{ animationDelay: "0.6s" }}
-                        >
-                          💯
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <div className="text-center space-y-2">
-                <div className="text-sm font-medium text-accent">6 Months • Personalized Training</div>
-                <p className="text-sm text-muted-foreground italic">
-                  "I never thought I could love my body this much. Hamza changed my entire relationship with fitness!"
-                </p>
-              </div>
-            </div>
-
-            {/* Skinny to Muscle Transformation - Right */}
-            <div className="space-y-6">
-              <div className="text-center">
-                <h3 className="text-xl font-bold text-foreground mb-2">Muscle Building Journey</h3>
-                <p className="text-muted-foreground">Mike's amazing 25lb muscle gain transformation</p>
-              </div>
-
-              <Card className="relative overflow-hidden border-2 border-accent/20 bg-card shadow-xl">
-                <CardContent className="p-0">
-                  <div className="relative aspect-[4/5] bg-gradient-to-br from-blue-50 to-blue-100">
-                    {/* Before Image */}
-                    <div
-                      className={`absolute inset-0 transition-all duration-1000 ${showTransformation.right ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
-                    >
-                      <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                        <div className="text-center space-y-4">
-                          <div className="w-32 h-32 bg-blue-300 rounded-full mx-auto flex items-center justify-center">
-                            <span className="text-4xl">😟</span>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="text-lg font-semibold text-blue-800">BEFORE</div>
-                            <div className="text-sm text-blue-600">140 lbs • Skinny • Low Confidence</div>
-                          </div>
-                        </div>
-                      </div>
                     </div>
-
-                    {/* After Image */}
-                    <div
-                      className={`absolute inset-0 transition-all duration-1000 ${showTransformation.right ? "opacity-100 scale-100" : "opacity-0 scale-105"}`}
-                    >
-                      <div className="w-full h-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center">
-                        <div className="text-center space-y-4">
-                          <div className="w-32 h-32 bg-purple-300 rounded-full mx-auto flex items-center justify-center">
-                            <span className="text-4xl">🏆</span>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="text-lg font-semibold text-purple-800">AFTER</div>
-                            <div className="text-sm text-purple-600">165 lbs • Muscular • Strong</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Reveal Button */}
-                    {!showTransformation.right && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Button
-                          onClick={() => handleTransformationReveal("right")}
-                          size="lg"
-                          className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-2xl animate-pulse"
-                        >
-                          <Play className="mr-2 h-5 w-5" />
-                          Reveal Transformation
-                        </Button>
-                      </div>
-                    )}
-
-                    {/* Celebration Effect */}
-                    {showTransformation.right && (
-                      <div className="absolute inset-0 pointer-events-none">
-                        <div className="absolute top-4 left-4 animate-bounce text-2xl">🎊</div>
-                        <div
-                          className="absolute top-8 right-6 animate-bounce text-2xl"
-                          style={{ animationDelay: "0.2s" }}
-                        >
-                          ⚡
-                        </div>
-                        <div
-                          className="absolute bottom-12 left-8 animate-bounce text-2xl"
-                          style={{ animationDelay: "0.4s" }}
-                        >
-                          💪
-                        </div>
-                        <div
-                          className="absolute bottom-6 right-4 animate-bounce text-2xl"
-                          style={{ animationDelay: "0.6s" }}
-                        >
-                          🚀
-                        </div>
-                      </div>
-                    )}
                   </div>
-                </CardContent>
-              </Card>
-
-              <div className="text-center space-y-2">
-                <div className="text-sm font-medium text-accent">8 Months • Strength Training</div>
-                <p className="text-sm text-muted-foreground italic">
-                  "From skinny to strong! Hamza's program gave me the confidence I never had before."
-                </p>
-              </div>
-            </div>
+                </div>
+              );
+            })}
           </div>
-
-          {/* Reset Button */}
-          {(showTransformation.left || showTransformation.right) && (
-            <div className="text-center mt-8">
-              <Button
-                onClick={() => setShowTransformation({ left: false, right: false })}
-                variant="outline"
-                className="bg-transparent"
-              >
-                <ArrowRight className="mr-2 h-4 w-4" />
-                Reset Transformations
-              </Button>
-            </div>
-          )}
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 sm:py-16 bg-muted/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <Card key={index} className="border border-border bg-card text-center">
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <stat.icon className="h-6 w-6 text-accent" />
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-bold text-card-foreground mb-2">{stat.number}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </CardContent>
-              </Card>
-            ))}
+      <section className="py-16 bg-black text-white">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold mb-4">Proven Results</h3>
+            <p className="text-slate-300">Real transformations, real people, real results</p>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">500+</div>
+              <div className="text-slate-300">Success Stories</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">95%</div>
+              <div className="text-slate-300">Goal Achievement</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">10+</div>
+              <div className="text-slate-300">Years Experience</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">24/7</div>
+              <div className="text-slate-300">Support</div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Success Stories Grid */}
-      <section className="py-16 sm:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-balance mb-4 tracking-tight text-foreground">
-              Transformation <span className="text-accent">Stories</span>
-            </h2>
-            <p className="text-lg text-muted-foreground text-pretty max-w-3xl mx-auto leading-relaxed">
-              Each story represents months of dedication, personalized coaching, and life-changing results. Your story
-              could be next.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            {successStories.map((story, index) => (
-              <Card key={index} className="border border-border bg-card hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6 lg:p-8">
-                  <div className="space-y-6">
-                    {/* Header */}
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <h3 className="text-xl font-semibold text-card-foreground">{story.name}</h3>
-                        <div className="flex items-center gap-1">
-                          {[...Array(story.rating)].map((_, i) => (
-                            <Star key={i} className="h-4 w-4 fill-accent text-accent" />
-                          ))}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-medium text-accent">{story.achievement}</div>
-                        <div className="text-xs text-muted-foreground">{story.timeframe}</div>
-                      </div>
-                    </div>
-
-                    {/* Before/After Stats */}
-                    {story.beforeWeight !== "N/A" && (
-                      <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
-                        <div className="text-center">
-                          <div className="text-sm text-muted-foreground mb-1">Before</div>
-                          <div className="text-lg font-semibold text-foreground">{story.beforeWeight}</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-sm text-muted-foreground mb-1">After</div>
-                          <div className="text-lg font-semibold text-accent">{story.afterWeight}</div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Goals */}
-                    <div className="space-y-2">
-                      <div className="text-sm font-medium text-foreground">Goals Achieved:</div>
-                      <div className="flex flex-wrap gap-2">
-                        {story.goals.map((goal, goalIndex) => (
-                          <span
-                            key={goalIndex}
-                            className="inline-flex items-center px-2.5 py-1 bg-accent/10 text-accent rounded-full text-xs font-medium"
-                          >
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            {goal}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Testimonial */}
-                    <div className="relative">
-                      <Quote className="absolute -top-2 -left-2 h-6 w-6 text-accent/30" />
-                      <p className="text-muted-foreground leading-relaxed pl-4 italic">"{story.testimonial}"</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Before/After Gallery Section */}
-      <section className="py-16 sm:py-20 bg-muted/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-balance mb-4 tracking-tight text-foreground">
-              Visual <span className="text-accent">Transformations</span>
-            </h2>
-            <p className="text-lg text-muted-foreground text-pretty max-w-3xl mx-auto leading-relaxed">
-              Pictures speak louder than words. See the incredible physical transformations our clients have achieved.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-              <Card key={item} className="border border-border bg-card overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-                    <div className="text-center space-y-2">
-                      <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto">
-                        <Trophy className="h-8 w-8 text-accent" />
-                      </div>
-                      <div className="text-sm font-medium text-muted-foreground">Before/After Photo</div>
-                      <div className="text-xs text-muted-foreground">Transformation #{item}</div>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <div className="text-sm font-medium text-card-foreground mb-1">Client Transformation</div>
-                    <div className="text-xs text-muted-foreground">Amazing results in record time</div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 sm:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <Card className="border-2 border-accent/20 bg-card shadow-xl">
-            <CardContent className="p-8 lg:p-12 text-center">
-              <div className="space-y-6">
-                <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto">
-                  <Zap className="h-8 w-8 text-accent" />
-                </div>
-
-                <div className="space-y-4">
-                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
-                    Your Success Story <span className="text-accent">Starts Here</span>
-                  </h2>
-                  <p className="text-lg text-muted-foreground text-pretty max-w-2xl mx-auto leading-relaxed">
-                    Join hundreds of others who have transformed their lives with personalized training and expert
-                    guidance. Your transformation is just one decision away.
-                  </p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button size="lg" className="!bg-black !text-white hover:!bg-gray-800">
-                    <Calendar className="mr-2 h-5 w-5" />
-                    Book Free Strategy Session
-                  </Button>
-                  <Button size="lg" variant="outline" className="bg-transparent">
-                    <ArrowRight className="mr-2 h-5 w-5" />
-                    View Training Programs
-                  </Button>
-                </div>
-
-                <div className="pt-4 border-t border-border">
-                  <p className="text-sm text-muted-foreground">
-                    Join our community of 500+ successful transformations • Free consultation • No obligations
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+      {/* Call to Action */}
+      <StrategySession></StrategySession>
     </div>
   )
 }

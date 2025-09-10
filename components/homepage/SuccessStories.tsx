@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight } from "lucide-react"
-
+import Link from "next/link"
 export default function SuccessStories() {
   // Changed to track multiple active stories independently
   const [activeStories, setActiveStories] = useState<Record<number, boolean>>({});
@@ -223,12 +223,14 @@ export default function SuccessStories() {
             ? 'opacity-100 translate-y-0' 
             : 'opacity-0 translate-y-8'
         }`}>
-          <Button 
-            className="bg-accent hover:bg-accent/90 cursor-pointer text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 group hover:scale-105 hover:shadow-lg active:scale-95"
-          >
-            <span>See More Transformations</span>
-            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
-          </Button>
+         <Link href="/success-stories" passHref>
+      <Button 
+        className="bg-accent hover:bg-accent/90 cursor-pointer text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 group hover:scale-105 hover:shadow-lg active:scale-95"
+      >
+        <span>See More Transformations</span>
+        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
+      </Button>
+    </Link>
         </div>
       </div>
     </section>
