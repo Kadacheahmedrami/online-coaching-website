@@ -46,7 +46,7 @@ export default function Header() {
           : 'opacity-0 -translate-y-full'
       }`}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
+      <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
         <a 
           href="/" 
           className={`flex items-center space-x-2 transition-all duration-700 ease-out delay-200 ${
