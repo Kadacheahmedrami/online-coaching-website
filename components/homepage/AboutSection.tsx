@@ -44,7 +44,7 @@ export default function AboutSection() {
               : 'opacity-0 -translate-x-8'
           }`}>
             <img
-              src="/hamza.png"
+              src="/hamza-bio.png"
               alt="Hamza - Professional Fitness Trainer"
               className="w-full h-auto rounded-2xl shadow-2xl"
             />

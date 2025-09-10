@@ -256,7 +256,7 @@ export default function ElegantSuccessStories() {
                         <Button 
                           onClick={() => toggleStory(story.id)}
                           size="lg"
-                          className={`transition-all duration-300 px-8 py-3 rounded-full ${
+                          className={`transition-all cursor-pointer duration-300 px-8 py-3 rounded-full ${
                             isActive 
                               ? 'bg-green-600 hover:bg-green-700' 
                               : 'bg-slate-900 hover:bg-slate-800'
@@ -271,7 +271,7 @@ export default function ElegantSuccessStories() {
                           onClick={() => navigateToTransformation(story.id)}
                         
                           size="lg"
-                          className="px-8 py-3 rounded-full border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400 transition-all duration-300"
+                          className="px-8 py-3 rounded-full bg-accent-foreground border cursor-pointer  border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400 transition-all duration-300"
                         >
                           See More Details
                           <ArrowRight className="w-5 h-5 ml-2" />
