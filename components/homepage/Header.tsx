@@ -49,7 +49,7 @@ export default function Header() {
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
         <a 
           href="/" 
-          className={`flex items-center space-x-2 transition-all duration-700 ease-out delay-200 ${
+          className={`flex items-center space-x-2 transition-all  ease-out  ${
             isVisible 
               ? 'opacity-100 translate-y-0 scale-100' 
               : 'opacity-0 -translate-y-6 scale-95'
@@ -60,16 +60,16 @@ export default function Header() {
 
         <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
           {[
-            { href: "/success-stories", text: "Success Stories", delay: "delay-300" },
-            { href: "/about", text: "About", delay: "delay-400" },
-            { href: "/free-training", text: "Free Training", delay: "delay-500" },
-            { href: "/blog", text: "Blog", delay: "delay-700" },
+            { href: "/success-stories", text: "Success Stories", delay: "" },
+            { href: "/about", text: "About", delay: "" },
+            { href: "/free-training", text: "Free Training", delay: "" },
+            { href: "/blog", text: "Blog", delay: "" },
         
           ].map((item, index) => (
             <a 
               key={index}
               href={item.href} 
-              className={`text-muted-foreground hover:text-accent transition-all duration-700 ease-out text-sm ${item.delay} ${
+              className={`text-muted-foreground hover:text-accent transition-all  ease-out text-sm ${item.delay} ${
                 isVisible 
                   ? 'opacity-100 translate-y-0' 
                   : 'opacity-0 -translate-y-4'
@@ -80,7 +80,7 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className={`md:hidden transition-all duration-700 ease-out delay-300 ${
+        <div className={`md:hidden transition-all  ease-out  ${
           isVisible 
             ? 'opacity-100 translate-y-0 scale-100' 
             : 'opacity-0 -translate-y-4 scale-95'
@@ -90,7 +90,7 @@ export default function Header() {
           </Button>
         </div>
 
-        <Button className={`hidden md:flex !bg-accent !text-white hover:!bg-red-800 rounded-lg px-4 md:px-5 lg:px-6 py-2 text-sm font-medium shadow-sm transition-all duration-700 ease-out delay-1000 hover:scale-105 ${
+        <Button className={`hidden md:flex !bg-accent !text-white hover:!bg-red-800 rounded-lg px-4 md:px-5 lg:px-6 py-2 text-sm font-medium shadow-sm transition-all  ease-out delay-1000 hover:scale-105 ${
           isVisible 
             ? 'opacity-100 translate-y-0 scale-100' 
             : 'opacity-0 -translate-y-6 scale-95'

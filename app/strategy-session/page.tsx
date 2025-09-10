@@ -1,87 +1,82 @@
 "use client"
 
 import type React from "react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
-  Calendar,
-  CheckCircle,
-  Clock,
+  User,
+  Mail,
+  Phone,
   Target,
-  Zap,
-  Award,
-  Heart,
-  TrendingUp,
-  MessageCircle,
-  Video,
+  Activity,
+  Calendar,
   ArrowRight,
-  Star,
+  ArrowLeft,
+  CheckCircle,
+  Scale,
+  Trophy,
+  Clock,
+  Heart
 } from "lucide-react"
 import { useState } from "react"
 
-export default function StrategySessionPage() {
-  const [selectedTime, setSelectedTime] = useState("")
+export default function CoachingApplicationForm() {
+  const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
-    goals: "",
+    age: "",
+    currentState: "",
+    primaryGoal: "",
+    timeFrame: "",
     experience: "",
     availability: "",
+    motivation: "",
+    challenges: ""
   })
 
-  const sessionBenefits = [
-    {
-      title: "Personalized Fitness Assessment",
-      description: "Complete evaluation of your current fitness level, strengths, and areas for improvement",
-      icon: Target,
-    },
-    {
-      title: "Custom Goal Setting",
-      description: "Define clear, achievable fitness goals with realistic timelines and milestones",
-      icon: TrendingUp,
-    },
-    {
-      title: "Workout Plan Preview",
-      description: "Get a sample of what your personalized training program would look like",
-      icon: Award,
-    },
-    {
-      title: "Nutrition Guidance",
-      description: "Basic nutrition principles and meal planning strategies for your goals",
-      icon: Heart,
-    },
-    {
-      title: "Obstacle Identification",
-      description: "Identify potential challenges and create strategies to overcome them",
-      icon: CheckCircle,
-    },
-    {
-      title: "Next Steps Planning",
-      description: "Clear roadmap for your fitness journey with actionable next steps",
-      icon: ArrowRight,
-    },
+  const totalSteps = 6
+
+  const currentStates = [
+    { value: "overweight", label: "Overweight", icon: Scale },
+    { value: "skinny", label: "Skinny/Underweight", icon: User },
+    { value: "lean", label: "Lean", icon: Activity },
+    { value: "muscular", label: "Muscular", icon: Trophy },
+    { value: "average", label: "Average/Normal", icon: Heart },
+    { value: "obese", label: "Obese", icon: Scale }
   ]
 
-  const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"]
+  const goals = [
+    { value: "weight_loss", label: "Weight Loss", icon: Scale },
+    { value: "muscle_gain", label: "Muscle Gain", icon: Trophy },
+    { value: "strength", label: "Build Strength", icon: Activity },
+    { value: "endurance", label: "Improve Endurance", icon: Heart },
+    { value: "toning", label: "Body Toning", icon: Target },
+    { value: "general_fitness", label: "General Fitness", icon: CheckCircle }
+  ]
 
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      text: "The strategy session was incredibly valuable. Hamza helped me understand exactly what I needed to do to reach my goals.",
-      rating: 5,
-    },
-    {
-      name: "Mike Chen",
-      text: "Even the free consultation provided more value than I expected. It gave me clarity and motivation to start my journey.",
-      rating: 5,
-    },
-    {
-      name: "Emma Davis",
-      text: "Hamza's expertise was evident from the first conversation. The session set the foundation for my successful transformation.",
-      rating: 5,
-    },
+  const timeFrames = [
+    { value: "3_months", label: "3 Months" },
+    { value: "6_months", label: "6 Months" },
+    { value: "12_months", label: "12 Months" },
+    { value: "ongoing", label: "Ongoing Journey" }
+  ]
+
+  const experienceLevels = [
+    { value: "beginner", label: "Complete Beginner" },
+    { value: "some", label: "Some Experience" },
+    { value: "intermediate", label: "Intermediate" },
+    { value: "advanced", label: "Advanced" }
+  ]
+
+  const availabilityOptions = [
+    { value: "3_days", label: "3 days per week" },
+    { value: "4_days", label: "4 days per week" },
+    { value: "5_days", label: "5 days per week" },
+    { value: "6_days", label: "6 days per week" },
+    { value: "daily", label: "Daily" }
   ]
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -91,345 +86,418 @@ export default function StrategySessionPage() {
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle form submission
-    console.log("Form submitted:", { ...formData, selectedTime })
+  const handleOptionSelect = (field: string, value: string) => {
+    setFormData({
+      ...formData,
+      [field]: value
+    })
+  }
+
+  const nextStep = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1)
+    }
+  }
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const handleSubmit = () => {
+    console.log("Application submitted:", formData)
+    // Handle form submission here
+    alert("Application submitted successfully! We'll get back to you within 24 hours.")
+  }
+
+  const isStepValid = () => {
+    switch (currentStep) {
+      case 1:
+        return formData.firstName && formData.lastName && formData.age
+      case 2:
+        return formData.email && formData.phone
+      case 3:
+        return formData.currentState
+      case 4:
+        return formData.primaryGoal && formData.timeFrame
+      case 5:
+        return formData.experience && formData.availability
+      case 6:
+        return formData.motivation && formData.challenges
+      default:
+        return true
+    }
+  }
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <div className="text-center space-y-2">
+              <User className="w-12 h-12 text-accent mx-auto" />
+              <h2 className="text-2xl font-bold">Personal Information</h2>
+              <p className="text-muted-foreground">Let's start with the basics</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="firstName" className="text-sm font-medium">
+                  First Name *
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                  placeholder="John"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="lastName" className="text-sm font-medium">
+                  Last Name *
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                  placeholder="Doe"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="age" className="text-sm font-medium">
+                Age *
+              </label>
+              <input
+                type="number"
+                id="age"
+                name="age"
+                value={formData.age}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                placeholder="25"
+                min="16"
+                max="100"
+              />
+            </div>
+          </div>
+        )
+
+      case 2:
+        return (
+          <div className="space-y-6">
+            <div className="text-center space-y-2">
+              <Mail className="w-12 h-12 text-accent mx-auto" />
+              <h2 className="text-2xl font-bold">Contact Information</h2>
+              <p className="text-muted-foreground">How can we reach you?</p>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                  placeholder="john.doe@example.com"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="phone" className="text-sm font-medium">
+                  Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                  placeholder="+1 (555) 123-4567"
+                />
+              </div>
+            </div>
+          </div>
+        )
+
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div className="text-center space-y-2">
+              <Activity className="w-12 h-12 text-accent mx-auto" />
+              <h2 className="text-2xl font-bold">Current Physical State</h2>
+              <p className="text-muted-foreground">How would you describe your current body composition?</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              {currentStates.map((state) => (
+                <button
+                  key={state.value}
+                  type="button"
+                  onClick={() => handleOptionSelect("currentState", state.value)}
+                  className={`p-4 border rounded-lg transition-all text-left hover:border-accent ${
+                    formData.currentState === state.value
+                      ? "border-accent bg-accent/10 text-accent"
+                      : "border-border text-foreground"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <state.icon className="w-5 h-5" />
+                    <span className="font-medium">{state.label}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )
+
+      case 4:
+        return (
+          <div className="space-y-6">
+            <div className="text-center space-y-2">
+              <Target className="w-12 h-12 text-accent mx-auto" />
+              <h2 className="text-2xl font-bold">Goals & Timeline</h2>
+              <p className="text-muted-foreground">What do you want to achieve?</p>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Primary Goal *</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {goals.map((goal) => (
+                    <button
+                      key={goal.value}
+                      type="button"
+                      onClick={() => handleOptionSelect("primaryGoal", goal.value)}
+                      className={`p-3 border rounded-lg transition-all text-left hover:border-accent ${
+                        formData.primaryGoal === goal.value
+                          ? "border-accent bg-accent/10 text-accent"
+                          : "border-border text-foreground"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <goal.icon className="w-4 h-4" />
+                        <span className="text-sm font-medium">{goal.label}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Desired Timeline *</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {timeFrames.map((timeFrame) => (
+                    <button
+                      key={timeFrame.value}
+                      type="button"
+                      onClick={() => handleOptionSelect("timeFrame", timeFrame.value)}
+                      className={`p-3 border rounded-lg transition-all text-center hover:border-accent ${
+                        formData.timeFrame === timeFrame.value
+                          ? "border-accent bg-accent/10 text-accent"
+                          : "border-border text-foreground"
+                      }`}
+                    >
+                      <span className="text-sm font-medium">{timeFrame.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
+      case 5:
+        return (
+          <div className="space-y-6">
+            <div className="text-center space-y-2">
+              <Clock className="w-12 h-12 text-accent mx-auto" />
+              <h2 className="text-2xl font-bold">Experience & Availability</h2>
+              <p className="text-muted-foreground">Tell us about your fitness background</p>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Fitness Experience *</label>
+                <div className="space-y-2">
+                  {experienceLevels.map((level) => (
+                    <button
+                      key={level.value}
+                      type="button"
+                      onClick={() => handleOptionSelect("experience", level.value)}
+                      className={`w-full p-3 border rounded-lg transition-all text-left hover:border-accent ${
+                        formData.experience === level.value
+                          ? "border-accent bg-accent/10 text-accent"
+                          : "border-border text-foreground"
+                      }`}
+                    >
+                      <span className="font-medium">{level.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Training Availability *</label>
+                <div className="space-y-2">
+                  {availabilityOptions.map((availability) => (
+                    <button
+                      key={availability.value}
+                      type="button"
+                      onClick={() => handleOptionSelect("availability", availability.value)}
+                      className={`w-full p-3 border rounded-lg transition-all text-left hover:border-accent ${
+                        formData.availability === availability.value
+                          ? "border-accent bg-accent/10 text-accent"
+                          : "border-border text-foreground"
+                      }`}
+                    >
+                      <span className="font-medium">{availability.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
+      case 6:
+        return (
+          <div className="space-y-6">
+            <div className="text-center space-y-2">
+              <Heart className="w-12 h-12 text-accent mx-auto" />
+              <h2 className="text-2xl font-bold">Motivation & Challenges</h2>
+              <p className="text-muted-foreground">Help us understand your journey better</p>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="motivation" className="text-sm font-medium">
+                  What motivates you to start this fitness journey? *
+                </label>
+                <textarea
+                  id="motivation"
+                  name="motivation"
+                  value={formData.motivation}
+                  onChange={handleInputChange}
+                  rows={4}
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
+                  placeholder="Share what drives you to make this change..."
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="challenges" className="text-sm font-medium">
+                  What challenges have you faced in the past? *
+                </label>
+                <textarea
+                  id="challenges"
+                  name="challenges"
+                  value={formData.challenges}
+                  onChange={handleInputChange}
+                  rows={4}
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
+                  placeholder="Tell us about any obstacles you've encountered..."
+                />
+              </div>
+            </div>
+          </div>
+        )
+
+      default:
+        return null
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-16 sm:py-20 md:py-24 lg:py-32">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="text-center space-y-6">
-            <div className="inline-flex items-center px-3 py-1.5 bg-primary text-primary-foreground rounded-full text-xs font-medium">
-              <Calendar className="w-3 h-3 mr-1.5" />
-              100% Free • No Obligations
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10 py-8">
+      <div className="container mx-auto px-4 max-w-2xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2">Online Coaching Application</h1>
+          <p className="text-muted-foreground">Transform your fitness journey with personalized coaching</p>
+        </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-balance tracking-tight text-foreground">
-              Free <span className="text-accent">Strategy Session</span>
-            </h1>
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-muted-foreground">
+              Step {currentStep} of {totalSteps}
+            </span>
+            <span className="text-sm font-medium text-muted-foreground">
+              {Math.round((currentStep / totalSteps) * 100)}%
+            </span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2">
+            <div
+              className="bg-accent h-2 rounded-full transition-all duration-300"
+              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            />
+          </div>
+        </div>
 
-            <p className="text-lg sm:text-xl text-muted-foreground text-pretty max-w-3xl mx-auto leading-relaxed">
-              Get personalized fitness guidance in a complimentary 30-minute consultation. Discover exactly what you
-              need to achieve your goals with a custom roadmap designed just for you.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="!bg-black !text-white hover:!bg-gray-800">
-                <Calendar className="mr-2 h-5 w-5" />
-                Book Your Free Session
+        {/* Form Card */}
+        <Card className="border border-border bg-card shadow-lg">
+          <CardContent className="p-8">
+            {renderStep()}
+            
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-8 pt-6 border-t border-border">
+              <Button
+                onClick={prevStep}
+                variant="outline"
+                disabled={currentStep === 1}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Previous
               </Button>
-              <Button size="lg" variant="outline" className="bg-transparent">
-                <MessageCircle className="mr-2 h-5 w-5" />
-                Ask Questions First
-              </Button>
+              
+              {currentStep < totalSteps ? (
+                <Button
+                  onClick={nextStep}
+                  disabled={!isStepValid()}
+                  className="flex items-center gap-2 !bg-black !text-white hover:!bg-gray-800"
+                >
+                  Next
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!isStepValid()}
+                  className="flex items-center gap-2 !bg-green-600 !text-white hover:!bg-green-700"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  Submit Application
+                </Button>
+              )}
             </div>
-          </div>
+          </CardContent>
+        </Card>
+
+        {/* Footer */}
+        <div className="text-center mt-8">
+          <p className="text-sm text-muted-foreground">
+            Your information is secure and will only be used to create your personalized coaching plan.
+          </p>
         </div>
-      </section>
-
-      {/* Session Details */}
-      <section className="py-12 sm:py-16 bg-muted/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="border border-border bg-card text-center">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Clock className="h-6 w-6 text-accent" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2 text-card-foreground">30 Minutes</h3>
-                <p className="text-sm text-muted-foreground">
-                  Focused, valuable consultation designed to give you maximum insight in minimum time
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-border bg-card text-center">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Video className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2 text-card-foreground">Video Call</h3>
-                <p className="text-sm text-muted-foreground">
-                  Convenient online meeting via Zoom, Google Meet, or your preferred platform
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-border bg-card text-center">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Zap className="h-6 w-6 text-accent" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2 text-card-foreground">Completely Free</h3>
-                <p className="text-sm text-muted-foreground">
-                  No hidden costs, no obligations. Just valuable guidance to help you succeed
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* What You'll Get */}
-      <section className="py-16 sm:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-balance mb-4 tracking-tight text-foreground">
-              What You'll <span className="text-accent">Receive</span>
-            </h2>
-            <p className="text-lg text-muted-foreground text-pretty max-w-3xl mx-auto leading-relaxed">
-              This isn't just a sales call. You'll walk away with actionable insights and a clear plan, regardless of
-              whether you decide to work together.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sessionBenefits.map((benefit, index) => (
-              <Card key={index} className="border border-border bg-card hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center mb-4">
-                    <benefit.icon className="h-6 w-6 text-accent" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-3 text-card-foreground">{benefit.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{benefit.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Booking Form */}
-      <section className="py-16 sm:py-20 bg-muted/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-balance mb-4 tracking-tight text-foreground">
-              Book Your <span className="text-accent">Free Session</span>
-            </h2>
-            <p className="text-lg text-muted-foreground text-pretty max-w-2xl mx-auto leading-relaxed">
-              Fill out the form below and select your preferred time. I'll send you a calendar invite with all the
-              details.
-            </p>
-          </div>
-
-          <Card className="border-2 border-accent/20 bg-card shadow-xl">
-            <CardContent className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label htmlFor="name" className="text-sm font-medium text-foreground">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      required
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium text-foreground">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      required
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-                      placeholder="Enter your email"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label htmlFor="phone" className="text-sm font-medium text-foreground">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-                      placeholder="Optional"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="experience" className="text-sm font-medium text-foreground">
-                      Fitness Experience
-                    </label>
-                    <select
-                      id="experience"
-                      name="experience"
-                      value={formData.experience}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-                    >
-                      <option value="">Select your level</option>
-                      <option value="beginner">Complete Beginner</option>
-                      <option value="some">Some Experience</option>
-                      <option value="intermediate">Intermediate</option>
-                      <option value="advanced">Advanced</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="goals" className="text-sm font-medium text-foreground">
-                    Primary Fitness Goals *
-                  </label>
-                  <textarea
-                    id="goals"
-                    name="goals"
-                    required
-                    rows={4}
-                    value={formData.goals}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
-                    placeholder="Tell me about your fitness goals, challenges, and what you hope to achieve..."
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-sm font-medium text-foreground">Preferred Time Slot *</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {timeSlots.map((time) => (
-                      <button
-                        key={time}
-                        type="button"
-                        onClick={() => setSelectedTime(time)}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
-                          selectedTime === time
-                            ? "bg-accent text-accent-foreground border-accent"
-                            : "bg-background text-foreground border-border hover:border-accent"
-                        }`}
-                      >
-                        {time}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="pt-4">
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="w-full !bg-black !text-white hover:!bg-gray-800"
-                    disabled={!selectedTime || !formData.name || !formData.email || !formData.goals}
-                  >
-                    <Calendar className="mr-2 h-5 w-5" />
-                    Book My Free Strategy Session
-                  </Button>
-                </div>
-
-                <p className="text-xs text-muted-foreground text-center">
-                  By booking this session, you agree to receive communication about your fitness journey. No spam,
-                  unsubscribe anytime.
-                </p>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-16 sm:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-balance mb-4 tracking-tight text-foreground">
-              What Others <span className="text-accent">Say</span>
-            </h2>
-            <p className="text-lg text-muted-foreground text-pretty max-w-2xl mx-auto leading-relaxed">
-              Hear from people who started their transformation with a strategy session
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border border-border bg-card">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-1">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 fill-accent text-accent" />
-                      ))}
-                    </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed italic">"{testimonial.text}"</p>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                        <span className="text-primary-foreground font-medium text-xs">
-                          {testimonial.name.charAt(0)}
-                        </span>
-                      </div>
-                      <div className="text-sm font-medium text-card-foreground">{testimonial.name}</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-16 sm:py-20 bg-muted/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-balance mb-4 tracking-tight text-foreground">
-              Common <span className="text-accent">Questions</span>
-            </h2>
-          </div>
-
-          <div className="space-y-4">
-            <Card className="border border-border bg-card">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-2 text-card-foreground">
-                  Is this really free with no strings attached?
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Absolutely. This is a genuine consultation where I provide real value regardless of whether you decide
-                  to work with me. My goal is to help you succeed.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-border bg-card">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-2 text-card-foreground">What if I'm a complete beginner?</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Perfect! I love working with beginners because we can build the right foundation from day one. The
-                  session will be tailored to your current level.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-border bg-card">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-2 text-card-foreground">How do I prepare for the session?</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Just come with an open mind and be ready to discuss your goals honestly. I'll guide you through
-                  everything else during our conversation.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
+
   )
 }

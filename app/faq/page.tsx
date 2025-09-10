@@ -19,7 +19,7 @@ import {
   Search,
 } from "lucide-react"
 import { useState } from "react"
-
+import StrategySession from "@/components/homepage/StrategySession"
 export default function FAQPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
@@ -203,14 +203,11 @@ export default function FAQPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="!bg-black !text-white hover:!bg-gray-800">
+              <Button size="lg" className="cursor-pointer !bg-black !text-white hover:!bg-accent">
                 <Calendar className="mr-2 h-5 w-5" />
                 Book Free Consultation
               </Button>
-              <Button size="lg" variant="outline" className="bg-transparent">
-                <MessageCircle className="mr-2 h-5 w-5" />
-                Contact Support
-              </Button>
+          
             </div>
           </div>
         </div>
@@ -430,48 +427,8 @@ export default function FAQPage() {
           </div>
         </div>
       </section>
-
-      {/* Still Have Questions CTA */}
-      <section className="py-16 sm:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <Card className="border-2 border-accent/20 bg-card shadow-xl">
-            <CardContent className="p-8 lg:p-12 text-center">
-              <div className="space-y-6">
-                <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto">
-                  <Zap className="h-8 w-8 text-accent" />
-                </div>
-
-                <div className="space-y-4">
-                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
-                    Still Have <span className="text-accent">Questions?</span>
-                  </h2>
-                  <p className="text-lg text-muted-foreground text-pretty max-w-2xl mx-auto leading-relaxed">
-                    Can't find the answer you're looking for? Book a free strategy session or send us a message. We're
-                    here to help you succeed.
-                  </p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button size="lg" className="!bg-black !text-white hover:!bg-gray-800">
-                    <Calendar className="mr-2 h-5 w-5" />
-                    Book Free Strategy Session
-                  </Button>
-                  <Button size="lg" variant="outline" className="bg-transparent">
-                    <MessageCircle className="mr-2 h-5 w-5" />
-                    Send Us a Message
-                  </Button>
-                </div>
-
-                <div className="pt-4 border-t border-border">
-                  <p className="text-sm text-muted-foreground">
-                    Free consultation • No obligations • Get personalized answers • Available 7 days a week
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+      <StrategySession />
+      
     </div>
   )
 }
