@@ -1,0 +1,68 @@
+// HamzaGym.com Simplified Database Schema
+// Minimal schema with just BlogPost and Application
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// All content: blog posts, success stories, and free downloads
+model BlogPost {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Content
+  title       String
+  slug        String   @unique
+  content     String
+  excerpt     String?
+  
+  // Type of content
+  type        PostType @default(BLOG)
+  
+  // Media
+  image       String?
+  
+  // Publishing
+  published   Boolean @default(false)
+  featured    Boolean @default(false)
+  
+  @@map("blog_posts")
+}
+
+enum PostType {
+  BLOG           // Regular blog posts
+  SUCCESS_STORY  // Client transformations
+  FREE_CONTENT   // Lead magnets, free downloads
+}
+
+// Client applications for consultations
+model StrategySession {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  
+  // Personal Info
+  name        String
+  email       String
+  phone       String
+  
+  // Fitness Info
+  goal        String   // What they want to achieve
+  experience  String   // Beginner/Intermediate/Advanced
+  budget      String   // Budget range
+  
+  // Consultation
+  date        DateTime?
+  time        String?
+  
+  // Status
+  status      String   @default("pending") // pending, reviewed, called, converted
+  notes       String?
+  
+  @@map("StrategySession")
+}
