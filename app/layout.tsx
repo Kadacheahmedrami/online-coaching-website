@@ -59,15 +59,15 @@ export const metadata: Metadata = {
     images: [
       {
         url: '/hamza.png',
-        width: 1200,
-        height: 630,
+        width: 897,
+        height: 429,
         alt: 'Hamza Gym - Online Fitness Coaching',
         type: 'image/png',
       },
       {
         url: '/hamza.png',
-        width: 800,
-        height: 600,
+        width: 897,
+        height: 429,
         alt: 'Hamza Gym - Fitness Transformation',
         type: 'image/png',
       }
