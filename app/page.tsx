@@ -13,7 +13,7 @@ import ContactSection from "@/components/homepage/ContactSection"
 
 export default function HamazaGymLanding() {
   return (
-    <div className="min-h-screen w-screen overflow-hidden bg-gradient-to-br from-background via-background/90 to-primary/10">
+    <div className="min-h-screen w-full overflow-hidden bg-gradient-to-br from-background via-background/90 to-primary/10">
       
       <HeroSection />
       <SuccessStories />
