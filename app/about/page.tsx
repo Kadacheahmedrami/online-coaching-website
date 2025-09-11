@@ -24,7 +24,7 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative">
               <img
-                src="/hamza-bio.png"
+                src="/hamza-bio.webp"
                 alt="Hamza - Professional Fitness Trainer"
                 className="w-full max-w-md mx-auto rounded-3xl shadow-2xl"
               />

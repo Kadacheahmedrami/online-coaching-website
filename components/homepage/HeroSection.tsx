@@ -15,7 +15,7 @@ export default function HeroSection() {
   // Memoized image carousel data
   const images = useMemo(() => [
     {
-      src: "/gym-guy-transparent.png",
+      src: "/gym-guy-transparent.webp",
       alt: "Confident gym member at Hamaza Gym",
       type: "original",
     },
