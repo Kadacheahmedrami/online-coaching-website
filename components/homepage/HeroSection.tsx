@@ -200,13 +200,14 @@ export default function HeroSection() {
                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
             >
-              <Link href="/strategy-session">
+              <Link href="/strategy-session" className="inline-block">
                 <Button
                   size="lg"
                   className="bg-accent cursor-pointer font-bold hover:bg-accent/90 active:bg-accent/80 
                               !text-white rounded-lg px-4 sm:px-6 md:px-6 py-3 text-base sm:text-lg
                               shadow-md hover:shadow-lg transition-all duration-200 
-                              min-h-[44px] min-w-[44px] max-w-sm sm:w-auto"
+                              min-h-[48px] min-w-[200px] max-w-sm sm:w-auto
+                              focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none"
                 >
                   <Play className="mr-2 h-4 w-4" />
                   Book a FREE Strategy Session
@@ -284,21 +285,28 @@ export default function HeroSection() {
               </div>
 
               {/* Carousel indicators - Fixed touch targets for accessibility */}
-              <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 flex space-x-1">
                 {images.map((_, index) => (
                   <button
                     key={index}
+                    type="button"
                     onClick={() => handleCarouselClick(index)}
-                    className={`relative min-w-[44px] min-h-[44px] p-4 flex items-center justify-center transition-colors duration-300  focus:ring-accent focus:ring-offset-2 rounded-full  cursor-pointer ${
-                      index === currentImageIndex ? "" : ""
-                    }`}
-                    aria-label={`Go to image ${index + 1}`}
+                    className={`relative w-12 h-12 flex items-center justify-center transition-all duration-300 
+                               focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 
+                               rounded-full cursor-pointer hover:bg-accent/10 active:bg-accent/20
+                               ${index === currentImageIndex ? "scale-110" : "hover:scale-105"}`}
+                    aria-label={`Go to slide ${index + 1} of ${images.length}`}
+                    tabIndex={0}
                   >
                     <div
-                      className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                        index === currentImageIndex ? "bg-accent" : "bg-muted-foreground/40"
+                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                        index === currentImageIndex 
+                          ? "bg-accent scale-125 shadow-lg shadow-accent/50" 
+                          : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
                       }`}
                     />
+                    {/* Larger invisible hit area for better touch experience */}
+                    <div className="absolute inset-0 w-12 h-12" />
                   </button>
                 ))}
               </div>

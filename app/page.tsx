@@ -9,11 +9,11 @@ import StrategySession from "@/components/homepage/StrategySession"
 import BlogSection from "@/components/homepage/BlogSection"
 import FAQSection from "@/components/homepage/FAQSection"
 import ContactSection from "@/components/homepage/ContactSection"
-import Header from "@/components/homepage/Header"
+
 
 export default function HamazaGymLanding() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10">
+    <div className="min-h-screen w-screen overflow-hidden bg-gradient-to-br from-background via-background/90 to-primary/10">
       
       <HeroSection />
       <SuccessStories />

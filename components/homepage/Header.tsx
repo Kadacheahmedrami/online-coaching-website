@@ -9,7 +9,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
-    <header className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky py-1 top-0 z-50">
+    <header className="bg-background/95 w-full backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky py-1 top-0 z-50">
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
         <a href="/" className="flex items-center space-x-2">
           <Image src="/logo.svg" alt="Logo" width={100} height={80} />
