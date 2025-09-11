@@ -7,7 +7,7 @@ import Header from "@/components/homepage/Header"
 import Footer from "@/components/homepage/Footer"
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://hamzagym.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://hamza-sport.vercel.app'),
   
   title: {
     default: 'Hamza Gym - Transform Your Body with Expert Online Coaching',
@@ -142,9 +142,9 @@ export default function RootLayout({
               '@type': 'Organization',
               name: 'Hamza Gym',
               description: 'Premium online fitness coaching and personal training services',
-              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://hamzagym.com',
-              logo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://hamzagym.com'}/hamza.png`,
-              image: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://hamzagym.com'}/hamza.png`,
+              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://hamza-sport.vercel.app',
+              logo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://hamza-sport.vercel.app'}/hamza.png`,
+              image: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://hamza-sport.vercel.app'}/hamza.png`,
               sameAs: [
                 'https://www.facebook.com/hamzagym',
                 'https://www.instagram.com/hamzagym',
@@ -176,7 +176,7 @@ export default function RootLayout({
               serviceType: 'Fitness Training',
               availableChannel: {
                 '@type': 'ServiceChannel',
-                serviceUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://hamzagym.com',
+                serviceUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://hamza-sport.vercel.app',
                 serviceName: 'Online Platform'
               }
             })
