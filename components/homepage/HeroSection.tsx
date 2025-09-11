@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Play, Trophy, Clock, Zap } from "lucide-react"
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import Image from "next/image"
+import Link from "next/link"
 
 export default function HeroSection() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -199,16 +200,18 @@ export default function HeroSection() {
                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
             >
-              <Button
-                size="lg"
-                className="bg-accent cursor-pointer font-bold hover:bg-accent/90 active:bg-accent/80 
-                            !text-white rounded-lg px-0 md:px-6 sm:px-8 py-3 text-base sm:text-lg
-                            shadow-md hover:shadow-lg transition-all duration-200 
-                            max-w-sm sm:w-auto"
-              >
-                <Play className="mr-2 h-4 w-4" />
-                Book a FREE Strategy Session
-              </Button>
+              <Link href="/strategy-session">
+                <Button
+                  size="lg"
+                  className="bg-accent cursor-pointer font-bold hover:bg-accent/90 active:bg-accent/80 
+                              !text-white rounded-lg px-4 sm:px-6 md:px-6 py-3 text-base sm:text-lg
+                              shadow-md hover:shadow-lg transition-all duration-200 
+                              min-h-[44px] min-w-[44px] max-w-sm sm:w-auto"
+                >
+                  <Play className="mr-2 h-4 w-4" />
+                  Book a FREE Strategy Session
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -280,17 +283,23 @@ export default function HeroSection() {
                 )}
               </div>
 
-              {/* Carousel indicators - properly centered */}
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              {/* Carousel indicators - Fixed touch targets for accessibility */}
+              <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 flex space-x-2">
                 {images.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => handleCarouselClick(index)}
-                    className={`w-2 h-2 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 ${
-                      index === currentImageIndex ? "bg-accent" : "bg-muted-foreground/30"
+                    className={`relative min-w-[44px] min-h-[44px] p-4 flex items-center justify-center transition-colors duration-300  focus:ring-accent focus:ring-offset-2 rounded-full  cursor-pointer ${
+                      index === currentImageIndex ? "" : ""
                     }`}
                     aria-label={`Go to image ${index + 1}`}
-                  />
+                  >
+                    <div
+                      className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                        index === currentImageIndex ? "bg-accent" : "bg-muted-foreground/40"
+                      }`}
+                    />
+                  </button>
                 ))}
               </div>
 

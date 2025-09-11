@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
+
 export default function SuccessStories() {
   // Changed to track multiple active stories independently
   const [activeStories, setActiveStories] = useState<Record<number, boolean>>({});
@@ -146,23 +148,28 @@ export default function SuccessStories() {
                 >
                   <CardContent className="p-0">
                     {/* Image Container - Made smaller */}
-                    <div className="relative h-[480px] ">
+                    <div className="relative h-[480px]">
                       {/* Before Image (Default) */}
-                      <img 
+                      <Image 
                         src={story.beforeImage}
                         alt={`${story.name} before`}
-                        className={`absolute inset-0 w-full h-full object-contain transition-all duration-700 group-hover:scale-110 ${
+                        fill
+                        className={`object-contain transition-all duration-700 group-hover:scale-110 ${
                           isActive ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
                         }`}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 33vw"
+                        priority={index < 3} // Priority for first 3 images
                       />
 
                       {/* After Image (Revealed on Click) */}
-                      <img 
+                      <Image 
                         src={story.afterImage}
                         alt={`${story.name} after`}
-                        className={`absolute inset-0 w-full h-full object-contain transition-all duration-700 group-hover:scale-110 ${
+                        fill
+                        className={`object-contain transition-all duration-700 group-hover:scale-110 ${
                           isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
                         }`}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 33vw"
                       />
 
                       {/* Before/After Labels */}
@@ -223,14 +230,14 @@ export default function SuccessStories() {
             ? 'opacity-100 translate-y-0' 
             : 'opacity-0 translate-y-8'
         }`}>
-         <Link href="/success-stories" passHref>
-      <Button 
-        className="bg-accent hover:bg-accent/90 cursor-pointer text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 group hover:scale-105 hover:shadow-lg active:scale-95"
-      >
-        <span>See More Transformations</span>
-        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
-      </Button>
-    </Link>
+          <Link href="/success-stories">
+            <Button 
+              className="bg-accent hover:bg-accent/90 cursor-pointer text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 group hover:scale-105 hover:shadow-lg active:scale-95"
+            >
+              <span>See More Transformations</span>
+              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

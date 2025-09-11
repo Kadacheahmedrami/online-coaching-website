@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Award, Trophy, Target, ArrowRight } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
 
 export default function AboutSection() {
   const sectionRef = useRef(null)
@@ -43,10 +45,14 @@ export default function AboutSection() {
               ? 'opacity-100 translate-x-0' 
               : 'opacity-0 -translate-x-8'
           }`}>
-            <img
+            <Image
               src="/hamza-bio.webp"
               alt="Hamza - Professional Fitness Trainer"
+              width={600}
+              height={800}
               className="w-full h-auto rounded-2xl shadow-2xl"
+              priority
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
 
@@ -116,10 +122,12 @@ export default function AboutSection() {
                 ? 'opacity-100 translate-y-0' 
                 : 'opacity-0 translate-y-4'
             }`}>
-              <Button variant="outline" className="bg-transparent">
-                <a href="/about">Learn More About Hamza</a>
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link href="/about">
+                <Button variant="outline" className="bg-transparent">
+                  Learn More About Hamza
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
