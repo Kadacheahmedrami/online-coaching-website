@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation"
 import StrategySession from "@/components/homepage/StrategySession"
 
 interface TransformationData {
-  id: number;
+  id: string;
   name: string;
   achievement: string;
   beforeImage: string;
@@ -57,152 +57,52 @@ export default function TransformationDetails() {
   const [transformation, setTransformation] = useState<TransformationData | null>(null)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Mock data - In a real app, this would come from an API
-  const transformationsData: { [key: string]: TransformationData } = {
-    "1": {
-      id: 1,
-      name: "Sarah Johnson",
-      achievement: "Lost 25kg in 4 months",
-      beforeImage: "/transformations/before-body1.png",
-      afterImage: "/transformations/after-body1.png",
-      stats: "25kg Lost • 12% Body Fat Reduced",
-      testimonial: "The program completely changed my relationship with food and exercise. I feel stronger and more confident than ever before.",
-      age: 32,
-      height: "5'6\" (168cm)",
-      startWeight: "85kg",
-      endWeight: "60kg",
-      duration: "4 months",
-      program: "Fat Loss Transformation",
-      goals: ["Lose weight", "Improve health", "Build confidence", "Develop healthy habits"],
-      timeline: [
-        { week: 0, weight: "85kg", bodyFat: "32%", note: "Starting point - motivated but overwhelmed" },
-        { week: 4, weight: "80kg", bodyFat: "29%", note: "First month - learning new habits" },
-        { week: 8, weight: "74kg", bodyFat: "25%", note: "Halfway point - seeing real changes" },
-        { week: 12, weight: "67kg", bodyFat: "22%", note: "Three months - feeling amazing" },
-        { week: 16, weight: "60kg", bodyFat: "20%", note: "Goal achieved - new lifestyle established" }
-      ],
-      beforeStats: {
-        weight: "85kg",
-        bodyFat: "32%",
-        muscle: "38kg",
-        waist: "89cm"
-      },
-      afterStats: {
-        weight: "60kg",
-        bodyFat: "20%",
-        muscle: "40kg",
-        waist: "68cm"
-      },
-      additionalImages: [
-        "/transformations/before-body1.png",
-        "/transformations/after-body1.png",
-        "/transformations/progress-body1-1.png",
-        "/transformations/progress-body1-2.png"
-      ],
-      detailedTestimonial: "When I started this journey, I was at my heaviest weight and lowest confidence. I had tried countless diets and exercise programs before, but nothing stuck. This program was different because it wasn't just about the physical transformation - it addressed my mindset, habits, and relationship with food. The coaches didn't just give me a meal plan and workout routine; they taught me how to think about nutrition and exercise in a sustainable way. The hardest part was the first few weeks when I had to break old habits, but the support system made all the difference. Now, 4 months later, I'm not just 25kg lighter - I'm stronger, more energetic, and most importantly, I have the tools to maintain this lifestyle forever.",
-      challenges: [
-        "Emotional eating during stressful periods at work",
-        "Finding time for workouts with a busy schedule",
-        "Learning to meal prep and plan ahead",
-        "Overcoming plateau at week 10"
-      ],
-      keyFactors: [
-        "Consistent daily nutrition tracking",
-        "Progressive strength training 4x per week",
-        "Weekly check-ins with coach",
-        "Building a support network",
-        "Focus on sleep and stress management"
-      ],
-      measurements: {
-        chest: { before: "102cm", after: "88cm" },
-        waist: { before: "89cm", after: "68cm" },
-        hips: { before: "108cm", after: "90cm" },
-        arms: { before: "32cm", after: "28cm" }
-      }
-    },
-    "2": {
-      id: 2,
-      name: "Marcus Chen",
-      achievement: "Gained 15kg muscle mass",
-      beforeImage: "/transformations/before-body2.png",
-      afterImage: "/transformations/after-body2.png",
-      stats: "15kg Muscle Gained • 65kg to 80kg",
-      testimonial: "From skinny to strong - this transformation taught me that consistency and proper guidance can achieve anything.",
-      age: 24,
-      height: "5'10\" (178cm)",
-      startWeight: "65kg",
-      endWeight: "80kg",
-      duration: "8 months",
-      program: "Muscle Building Journey",
-      goals: ["Build muscle mass", "Increase strength", "Improve physique", "Boost confidence"],
-      timeline: [
-        { week: 0, weight: "65kg", bodyFat: "12%", note: "Skinny guy ready to transform" },
-        { week: 8, weight: "70kg", bodyFat: "13%", note: "First 2 months - learning proper form" },
-        { week: 16, weight: "74kg", bodyFat: "14%", note: "4 months - strength gains accelerating" },
-        { week: 24, weight: "77kg", bodyFat: "15%", note: "6 months - visible muscle growth" },
-        { week: 32, weight: "80kg", bodyFat: "15%", note: "Goal achieved - strong and confident" }
-      ],
-      beforeStats: {
-        weight: "65kg",
-        bodyFat: "12%",
-        muscle: "52kg",
-        waist: "76cm"
-      },
-      afterStats: {
-        weight: "80kg",
-        bodyFat: "15%",
-        muscle: "67kg",
-        waist: "81cm"
-      },
-      additionalImages: [
-        "/transformations/before-body2.png",
-        "/transformations/after-body2.png",
-        "/transformations/progress-body2-1.png",
-        "/transformations/progress-body2-2.png"
-      ],
-      detailedTestimonial: "I was the classic 'hardgainer' - I could eat anything and everything without gaining weight. While some people envied this, I was actually quite insecure about my skinny frame. I tried working out on my own for years but made very little progress because I didn't understand the importance of progressive overload, proper nutrition, and recovery. This program taught me that building muscle isn't just about lifting heavy weights - it's about consistency, eating enough of the right foods, and following a structured plan. The transformation wasn't just physical; I gained confidence that carries into every aspect of my life.",
-      challenges: [
-        "Eating enough calories to support muscle growth",
-        "Learning proper lifting technique and form",
-        "Staying consistent during busy work periods",
-        "Overcoming shoulder injury at month 5"
-      ],
-      keyFactors: [
-        "Progressive overload in strength training",
-        "Eating in a caloric surplus with adequate protein",
-        "Prioritizing compound movements",
-        "Consistent sleep schedule (8+ hours)",
-        "Regular form checks and technique refinement"
-      ],
-      measurements: {
-        chest: { before: "91cm", after: "107cm" },
-        waist: { before: "76cm", after: "81cm" },
-        hips: { before: "89cm", after: "96cm" },
-        arms: { before: "28cm", after: "36cm" }
-      }
-    },
-    // Add more transformations here...
+  // Combine before/after images with additional images
+  const getAllImages = (transformation: TransformationData) => {
+    const images = [transformation.beforeImage, transformation.afterImage]
+    if (transformation.additionalImages?.length > 0) {
+      images.push(...transformation.additionalImages)
+    }
+    return images
+  }
+
+  // Get image label based on index
+  const getImageLabel = (index: number, totalImages: number) => {
+    if (index === 0) return 'Before'
+    if (index === 1) return 'After'
+    return `Progress ${index - 1}`
   }
 
   useEffect(() => {
-    setIsLoading(true)
-    
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      const id = Array.isArray(params.id) ? params.id[0] : params.id
-      if (id && transformationsData[id]) {
-        setTransformation(transformationsData[id])
+    const fetchTransformation = async () => {
+      setIsLoading(true)
+      setError(null)
+      
+      try {
+        const id = Array.isArray(params.id) ? params.id[0] : params.id
+        const response = await fetch(`/api/success-stories/${id}`)
+        
+        if (!response.ok) {
+          throw new Error('Transformation not found')
+        }
+        
+        const data = await response.json()
+        setTransformation(data)
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'An error occurred')
+      } finally {
+        setIsLoading(false)
       }
-      setIsLoading(false)
-    }, 500)
+    }
 
-    return () => clearTimeout(timer)
+    fetchTransformation()
   }, [params.id])
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center px-4">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-slate-300 border-t-slate-900 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-600">Loading transformation details...</p>
@@ -211,12 +111,12 @@ export default function TransformationDetails() {
     )
   }
 
-  if (!transformation) {
+  if (error || !transformation) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">Transformation Not Found</h1>
-          <p className="text-slate-600 mb-8">The transformation you're looking for doesn't exist.</p>
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Transformation Not Found</h1>
+          <p className="text-slate-600 mb-8">{error || "The transformation you're looking for doesn't exist."}</p>
           <Button onClick={() => router.push('/success-stories')} className="bg-slate-900 hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Success Stories
@@ -226,58 +126,63 @@ export default function TransformationDetails() {
     )
   }
 
+  const allImages = getAllImages(transformation)
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Header */}
-      <section className="py-8 border-b border-slate-200">
+      <section className="py-6 md:py-8 border-b border-slate-200">
         <div className="container mx-auto px-4 max-w-6xl">
           <Button 
             onClick={() => router.push('/success-stories')} 
             variant="outline" 
-            className="mb-6 border-slate-300 text-slate-700 hover:bg-slate-100"
+            className="mb-4 md:mb-6 border-slate-300 text-slate-700 hover:bg-slate-100 w-full sm:w-auto"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Success Stories
           </Button>
           
-          <div className="flex flex-col lg:flex-row items-start gap-8">
+          <div className="flex flex-col space-y-6 lg:flex-row lg:items-start lg:gap-8 lg:space-y-0">
             <div className="flex-1">
-              <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
-                {transformation.name}'s Transformation
+              <h1 className="text-2xl w-full sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 leading-tight">
+                {transformation.name}'s <span className="text-accent text-3xl w-full sm:text-4xl lg:text-5xl"> Transformation</span> 
               </h1>
-              <p className="text-xl text-slate-600 mb-4">{transformation.achievement}</p>
-              <div className="flex flex-wrap gap-4 text-sm text-slate-600">
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  {transformation.duration}
+              <p className="text-lg sm:text-xl text-slate-600 mb-6">{transformation.achievement}</p>
+              
+              {/* Mobile-friendly info grid */}
+              <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-sm text-slate-600">
+                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg">
+                  <Calendar className="w-4 h-4 flex-shrink-0" />
+                  <span>{transformation.duration}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Target className="w-4 h-4" />
-                  {transformation.program}
+                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg">
+                  <Target className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">{transformation.program}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <TrendingUp className="w-4 h-4" />
-                  Age {transformation.age}
+                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg sm:col-span-2 lg:col-span-1">
+                  <TrendingUp className="w-4 h-4 flex-shrink-0" />
+                  <span>Age {transformation.age}</span>
                 </div>
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-xl shadow-lg">
-              <h3 className="font-semibold text-slate-900 mb-4">Quick Stats</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
+            {/* Stats card - responsive positioning */}
+            <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg w-full lg:w-auto lg:min-w-[280px]">
+              <h3 className="font-semibold text-slate-900 mb-4 text-center lg:text-left">Quick Stats</h3>
+              <div className="grid grid-cols-2 lg:block lg:space-y-2 gap-4 lg:gap-0 text-sm">
+                <div className="flex flex-col lg:flex-row lg:justify-between">
                   <span className="text-slate-600">Start Weight:</span>
                   <span className="font-medium">{transformation.startWeight}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col lg:flex-row lg:justify-between">
                   <span className="text-slate-600">End Weight:</span>
                   <span className="font-medium">{transformation.endWeight}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col lg:flex-row lg:justify-between">
                   <span className="text-slate-600">Height:</span>
                   <span className="font-medium">{transformation.height}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col lg:flex-row lg:justify-between">
                   <span className="text-slate-600">Duration:</span>
                   <span className="font-medium">{transformation.duration}</span>
                 </div>
@@ -288,34 +193,52 @@ export default function TransformationDetails() {
       </section>
 
       {/* Before/After Gallery */}
-      <section className="py-16">
+      <section className="py-8 md:py-16">
         <div className="container mx-auto px-4 max-w-6xl">
-          <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">Transformation Gallery</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6 md:mb-8 text-center">Transformation Gallery</h2>
           
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-8">
             {/* Main Image Display */}
-            <div className="relative h-96 lg:h-[500px] mb-6 bg-slate-100 rounded-xl overflow-hidden">
+            <div className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] mb-4 md:mb-6 bg-slate-100 rounded-xl overflow-hidden">
               <img 
-                src={transformation.additionalImages[activeImageIndex]}
-                alt={`Transformation progress ${activeImageIndex + 1}`}
+                src={allImages[activeImageIndex]}
+                alt={`${getImageLabel(activeImageIndex, allImages.length)} transformation`}
                 className="w-full h-full object-contain"
               />
               
               {/* Image Labels */}
-              <div className="absolute top-4 left-4">
-                <span className="bg-slate-900 text-white text-sm font-semibold px-3 py-1 rounded-full">
-                  {activeImageIndex === 0 ? 'Before' : activeImageIndex === 1 ? 'After' : `Progress ${activeImageIndex - 1}`}
+              <div className="absolute top-2 md:top-4 left-2 md:left-4">
+                <span className="bg-slate-900 text-white text-xs md:text-sm font-semibold px-2 md:px-3 py-1 rounded-full">
+                  {getImageLabel(activeImageIndex, allImages.length)}
                 </span>
               </div>
+
+              {/* Navigation Arrows */}
+              {allImages.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setActiveImageIndex(activeImageIndex === 0 ? allImages.length - 1 : activeImageIndex - 1)}
+                    className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-800 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200"
+                  >
+                    <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
+                  </button>
+                  <button
+                    onClick={() => setActiveImageIndex(activeImageIndex === allImages.length - 1 ? 0 : activeImageIndex + 1)}
+                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-800 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200"
+                  >
+                    <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 rotate-180" />
+                  </button>
+                </>
+              )}
             </div>
             
-            {/* Thumbnail Navigation */}
-            <div className="flex gap-4 justify-center overflow-x-auto pb-2">
-              {transformation.additionalImages.map((image, index) => (
+            {/* Thumbnail Navigation - Mobile Optimized */}
+            <div className="flex gap-2 md:gap-4 justify-start md:justify-center overflow-x-auto pb-2 scrollbar-hide">
+              {allImages.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setActiveImageIndex(index)}
-                  className={`relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all duration-300 ${
+                  className={`relative w-14 h-14 md:w-20 md:h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all duration-300 ${
                     activeImageIndex === index 
                       ? 'border-slate-900 shadow-lg' 
                       : 'border-slate-200 hover:border-slate-400'
@@ -323,25 +246,36 @@ export default function TransformationDetails() {
                 >
                   <img 
                     src={image}
-                    alt={`Thumbnail ${index + 1}`}
+                    alt={`${getImageLabel(index, allImages.length)} thumbnail`}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors duration-200"></div>
+                  
+                  {/* Thumbnail Label */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs py-1 px-1 text-center">
+                    <span className="hidden sm:inline">{getImageLabel(index, allImages.length)}</span>
+                    <span className="sm:hidden">{index === 0 ? 'B' : index === 1 ? 'A' : 'P'}</span>
+                  </div>
                 </button>
               ))}
+            </div>
+
+            {/* Image Counter */}
+            <div className="text-center mt-3 md:mt-4 text-sm text-slate-500">
+              {activeImageIndex + 1} of {allImages.length}
             </div>
           </div>
         </div>
       </section>
 
       {/* Stats Comparison */}
-      <section className="py-16 bg-slate-100">
+      <section className="py-8 md:py-16 bg-slate-100">
         <div className="container mx-auto px-4 max-w-6xl">
-          <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Before & After Comparison</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 md:mb-12 text-center">Before & After Comparison</h2>
           
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             {/* Before Stats */}
-            <div className="bg-white rounded-xl shadow-lg p-8">
+            <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
               <h3 className="text-xl font-bold text-red-600 mb-6 text-center">Before</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-slate-200">
@@ -364,7 +298,7 @@ export default function TransformationDetails() {
             </div>
 
             {/* After Stats */}
-            <div className="bg-white rounded-xl shadow-lg p-8">
+            <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
               <h3 className="text-xl font-bold text-green-600 mb-6 text-center">After</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-slate-200">
@@ -386,44 +320,42 @@ export default function TransformationDetails() {
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
-  
-      
-
       {/* Detailed Story */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-8 md:py-16 bg-slate-50">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">The Full Story</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6 md:mb-8 text-center">The Full Story</h2>
           
-          <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-            <blockquote className="text-lg leading-relaxed text-slate-700 italic">
+          <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-6 md:mb-8">
+            <blockquote className="text-base md:text-lg leading-relaxed text-slate-700 italic">
               "{transformation.detailedTestimonial}"
             </blockquote>
-            <div className="mt-6 flex items-center gap-2">
-              <Star className="w-5 h-5 text-yellow-400 fill-current" />
-              <Star className="w-5 h-5 text-yellow-400 fill-current" />
-              <Star className="w-5 h-5 text-yellow-400 fill-current" />
-              <Star className="w-5 h-5 text-yellow-400 fill-current" />
-              <Star className="w-5 h-5 text-yellow-400 fill-current" />
-              <span className="ml-2 text-slate-600">- {transformation.name}</span>
+            <div className="mt-6 flex flex-wrap items-center gap-2">
+              <div className="flex gap-1">
+                <Star className="w-4 h-4 md:w-5 md:h-5 text-yellow-400 fill-current" />
+                <Star className="w-4 h-4 md:w-5 md:h-5 text-yellow-400 fill-current" />
+                <Star className="w-4 h-4 md:w-5 md:h-5 text-yellow-400 fill-current" />
+                <Star className="w-4 h-4 md:w-5 md:h-5 text-yellow-400 fill-current" />
+                <Star className="w-4 h-4 md:w-5 md:h-5 text-yellow-400 fill-current" />
+              </div>
+              <span className="text-slate-600 text-sm md:text-base">- {transformation.name}</span>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {/* Challenges */}
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Target className="w-5 h-5 text-red-500" />
-                Challenges Overcome
+              <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <Target className="w-5 h-5 text-red-500 flex-shrink-0" />
+                <span>Challenges Overcome</span>
               </h3>
               <ul className="space-y-3">
                 {transformation.challenges.map((challenge, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">{challenge}</span>
+                    <span className="text-slate-700 text-sm md:text-base">{challenge}</span>
                   </li>
                 ))}
               </ul>
@@ -431,15 +363,15 @@ export default function TransformationDetails() {
 
             {/* Key Factors */}
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-green-500" />
-                Success Factors
+              <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-green-500 flex-shrink-0" />
+                <span>Success Factors</span>
               </h3>
               <ul className="space-y-3">
                 {transformation.keyFactors.map((factor, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <CheckCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">{factor}</span>
+                    <span className="text-slate-700 text-sm md:text-base">{factor}</span>
                   </li>
                 ))}
               </ul>

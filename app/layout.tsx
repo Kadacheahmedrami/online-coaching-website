@@ -83,11 +83,7 @@ export const metadata: Metadata = {
     site: '@hamzagym',
   },
 
-  verification: {
-    google: 'your-google-verification-code',
-    yandex: 'your-yandex-verification-code',
-    // Add other verification codes as needed
-  },
+
 
   alternates: {
     canonical: '/',
@@ -122,7 +118,7 @@ export default function RootLayout({
       <head>
         {/* Favicon */}
         <link rel="icon" href="/favicon.ico" sizes="32x32" />
-        <link rel="manifest" href="/manifest.json" />
+ 
         
         {/* Preconnect to external domains for better performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

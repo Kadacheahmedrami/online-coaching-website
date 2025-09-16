@@ -66,7 +66,7 @@ export default function AboutSection() {
                 Meet <span className="text-accent">Hamza</span>
               </h2>
               <p className="text-base sm:text-lg text-muted-foreground text-pretty leading-relaxed">
-                With over 10 years of experience in fitness and nutrition, Hamza has helped thousands of clients
+                With over 15 years of experience in fitness and nutrition, Hamza has helped thousands of clients
                 achieve their dream bodies and transform their lives.
               </p>
             </div>
@@ -78,9 +78,10 @@ export default function AboutSection() {
                   iconBg: "bg-accent/20",
                   iconColor: "text-accent",
                   title: "Certified Personal Trainer",
-                  subtitle: "NASM-CPT, Precision Nutrition Level 1",
+                  subtitle: "Professional fitness and coaching certification",
                   delay: "delay-300"
                 },
+          
                 {
                   icon: Trophy,
                   iconBg: "bg-primary/20",

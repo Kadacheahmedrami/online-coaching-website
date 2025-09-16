@@ -17,139 +17,54 @@ import {
   Zap,
   CheckCircle,
   Search,
+  Loader2,
 } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import StrategySession from "@/components/homepage/StrategySession"
+
+interface FAQ {
+  id: number;
+  question: string;
+  answer: string;
+  category: string;
+  popular: boolean;
+  order: number;
+}
+
 export default function FAQPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All")
+  const [faqs, setFaqs] = useState<FAQ[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const categories = ["All", "Getting Started", "Training", "Nutrition", "Pricing", "Support"]
 
-  const faqs = [
-    {
-      id: 1,
-      question: "How long does it take to see results?",
-      answer:
-        "Most clients start seeing noticeable changes within 2-4 weeks of consistent training and proper nutrition. Significant transformations typically occur within 8-12 weeks. However, results vary based on your starting point, goals, consistency, and individual factors like genetics and lifestyle.",
-      category: "Getting Started",
-      popular: true,
-    },
-    {
-      id: 2,
-      question: "Do I need prior gym experience to start?",
-      answer:
-        "Not at all! We work with clients of all fitness levels, from complete beginners to advanced athletes. Every program is customized to your current fitness level and goals. If you're new to exercise, we'll start with the basics and gradually progress as you build strength and confidence.",
-      category: "Getting Started",
-      popular: true,
-    },
-    {
-      id: 3,
-      question: "What's included in the training programs?",
-      answer:
-        "Our comprehensive programs include personalized workout plans, detailed nutrition guidance, progress tracking tools, form coaching videos, ongoing support through our app, weekly check-ins, and program adjustments based on your progress. You'll also get access to our exclusive member community.",
-      category: "Training",
-      popular: true,
-    },
-    {
-      id: 4,
-      question: "Can I train if I have injuries or physical limitations?",
-      answer:
-        "Yes! We specialize in working around injuries and physical limitations. All programs are adapted to ensure safe, effective training that supports your recovery and goals. We'll work with your healthcare providers when necessary and modify exercises to accommodate your specific needs.",
-      category: "Training",
-      popular: false,
-    },
-    {
-      id: 5,
-      question: "How often should I work out each week?",
-      answer:
-        "For most people, 3-4 workout sessions per week is optimal for building strength and seeing results while allowing adequate recovery. Beginners might start with 2-3 sessions, while more advanced individuals might train 4-5 times per week. We'll determine the right frequency based on your goals and schedule.",
-      category: "Training",
-      popular: false,
-    },
-    {
-      id: 6,
-      question: "Do I need to follow a strict diet?",
-      answer:
-        "No strict diets required! We focus on sustainable nutrition habits that fit your lifestyle. You'll learn how to make healthier choices while still enjoying foods you love. We provide flexible meal planning guidance and teach you how to balance nutrition with social events and busy schedules.",
-      category: "Nutrition",
-      popular: true,
-    },
-    {
-      id: 7,
-      question: "What if I can't stick to the meal plan?",
-      answer:
-        "Life happens, and we understand that! Our nutrition approach is flexible and adaptable. If you struggle with the meal plan, we'll work together to find alternatives that fit your preferences, schedule, and lifestyle. The goal is progress, not perfection.",
-      category: "Nutrition",
-      popular: false,
-    },
-    {
-      id: 8,
-      question: "How much do your programs cost?",
-      answer:
-        "Program pricing varies based on the level of support and duration you choose. We offer different packages to fit various budgets and needs. The best way to get accurate pricing is to book a free strategy session where we can discuss your goals and recommend the most suitable program for you.",
-      category: "Pricing",
-      popular: false,
-    },
-    {
-      id: 9,
-      question: "Do you offer payment plans?",
-      answer:
-        "Yes, we offer flexible payment options to make our programs accessible. We have monthly payment plans available for most programs. During your strategy session, we'll discuss payment options that work best for your budget.",
-      category: "Pricing",
-      popular: false,
-    },
-    {
-      id: 10,
-      question: "What if I'm not satisfied with my results?",
-      answer:
-        "We're committed to your success and stand behind our programs. If you follow the program as designed and don't see results within the specified timeframe, we'll work with you to adjust the approach or provide additional support at no extra cost. Your success is our priority.",
-      category: "Support",
-      popular: false,
-    },
-    {
-      id: 11,
-      question: "How do I track my progress?",
-      answer:
-        "We use multiple methods to track progress including body measurements, progress photos, strength improvements, energy levels, and how your clothes fit. We provide tracking sheets and recommend apps to make monitoring easy. Regular check-ins help us adjust your program based on your progress.",
-      category: "Training",
-      popular: false,
-    },
-    {
-      id: 12,
-      question: "Can I work out from home?",
-      answer:
-        "We offer both gym-based and home workout options. Home programs can be designed with minimal equipment or bodyweight exercises. We'll assess your available space and equipment to create an effective program that works for your situation.",
-      category: "Training",
-      popular: false,
-    },
-    {
-      id: 13,
-      question: "How quickly can I start after signing up?",
-      answer:
-        "You can typically start within 24-48 hours of signing up. After your enrollment, we'll schedule an onboarding call to set up your program, provide access to our app and resources, and answer any initial questions. Your custom program will be ready within 1-2 business days.",
-      category: "Getting Started",
-      popular: false,
-    },
-    {
-      id: 14,
-      question: "What makes your approach different from other trainers?",
-      answer:
-        "Our approach combines personalized programming, evidence-based methods, sustainable habit formation, and ongoing support. We focus on long-term lifestyle changes rather than quick fixes. Plus, you get direct access to me and our team, not just a generic program.",
-      category: "Getting Started",
-      popular: false,
-    },
-    {
-      id: 15,
-      question: "Do you work with people over 50?",
-      answer:
-        "Yes! We have extensive experience working with clients over 50. Our programs are adapted for age-appropriate training that focuses on maintaining mobility, building strength safely, and improving overall health. We understand the unique challenges and goals of mature adults.",
-      category: "Training",
-      popular: false,
-    },
-  ]
+  // Fetch FAQs from API
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/faq')
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch FAQs')
+        }
+        
+        const data = await response.json()
+        setFaqs(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        setLoading(false)
+      }
+    }
 
+    fetchFAQs()
+  }, [])
+
+  // Filter FAQs based on search and category
   const filteredFAQs = faqs.filter((faq) => {
     const matchesCategory = selectedCategory === "All" || faq.category === selectedCategory
     const matchesSearch =
@@ -159,6 +74,7 @@ export default function FAQPage() {
     return matchesCategory && matchesSearch
   })
 
+  // Get popular FAQs
   const popularFAQs = faqs.filter((faq) => faq.popular)
 
   const toggleFAQ = (id: number) => {
@@ -180,6 +96,36 @@ export default function FAQPage() {
       default:
         return HelpCircle
     }
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Loading FAQs...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-16 h-16 bg-destructive/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <HelpCircle className="w-8 h-8 text-destructive" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Error Loading FAQs</h1>
+          <p className="text-muted-foreground mb-6">{error}</p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Try Again
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -207,7 +153,6 @@ export default function FAQPage() {
                 <Calendar className="mr-2 h-5 w-5" />
                 Book Free Consultation
               </Button>
-          
             </div>
           </div>
         </div>
@@ -256,7 +201,7 @@ export default function FAQPage() {
       </section>
 
       {/* Popular Questions */}
-      {selectedCategory === "All" && searchTerm === "" && (
+      {selectedCategory === "All" && searchTerm === "" && popularFAQs.length > 0 && (
         <section className="py-12 sm:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
             <div className="mb-8">
@@ -333,9 +278,16 @@ export default function FAQPage() {
                         </div>
                         <div className="flex-1">
                           <h3 className="text-lg font-semibold text-card-foreground mb-2">{faq.question}</h3>
-                          <span className="inline-flex items-center px-2 py-1 bg-accent/10 text-accent rounded-full text-xs font-medium">
-                            {faq.category}
-                          </span>
+                          <div className="flex flex-wrap gap-2">
+                            <span className="inline-flex items-center px-2 py-1 bg-accent/10 text-accent rounded-full text-xs font-medium">
+                              {faq.category}
+                            </span>
+                            {faq.popular && (
+                              <span className="inline-flex items-center px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                                Popular
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       {openFAQ === faq.id ? (
@@ -357,7 +309,7 @@ export default function FAQPage() {
             ))}
           </div>
 
-          {filteredFAQs.length === 0 && (
+          {filteredFAQs.length === 0 && !loading && (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="h-8 w-8 text-muted-foreground" />
@@ -400,7 +352,7 @@ export default function FAQPage() {
                 <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <Users className="h-6 w-6 text-primary" />
                 </div>
-                <div className="text-2xl font-bold text-card-foreground mb-2">500+</div>
+                <div className="text-2xl font-bold text-card-foreground mb-2">1000+</div>
                 <div className="text-sm text-muted-foreground">Happy Clients</div>
               </CardContent>
             </Card>
@@ -410,7 +362,7 @@ export default function FAQPage() {
                 <div className="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <Award className="h-6 w-6 text-accent" />
                 </div>
-                <div className="text-2xl font-bold text-card-foreground mb-2">10+</div>
+                <div className="text-2xl font-bold text-card-foreground mb-2">15+</div>
                 <div className="text-sm text-muted-foreground">Years Experience</div>
               </CardContent>
             </Card>
@@ -427,8 +379,8 @@ export default function FAQPage() {
           </div>
         </div>
       </section>
-      <StrategySession />
       
+      <StrategySession />
     </div>
   )
 }

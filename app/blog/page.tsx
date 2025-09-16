@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BookOpen,
   Calendar,
@@ -12,79 +12,89 @@ import {
   ArrowRight,
   Search,
   Tag,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
+
+// Type definitions
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  image: string | null;
+  category: string;
+  readTime: string;
+  author: string;
+  publishedAt: string | null;
+  createdAt: string;
+}
 
 export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>({});
 
   const categories = ["All", "Workouts", "Nutrition", "Mindset", "Recovery"];
 
-  const blogPosts = [
-    {
-      id: 1,
-      title: "5 Common Workout Mistakes That Are Sabotaging Your Progress",
-      excerpt: "Avoid these critical errors that could be preventing you from reaching your fitness goals. Learn the proper techniques and mindset shifts needed to maximize your training results.",
-      category: "Workouts",
-      readTime: "5 min read",
-      publishDate: "2024-01-15",
-      author: "Hamza",
-      image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      id: 2,
-      title: "Meal Prep for Busy People: Simple Strategies That Actually Work",
-      excerpt: "Discover practical meal planning strategies that fit into your hectic schedule. Master the art of efficient cooking and smart grocery shopping for sustained energy.",
-      category: "Nutrition",
-      readTime: "7 min read",
-      publishDate: "2024-01-12",
-      author: "Hamza",
-      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      id: 3,
-      title: "Building Muscle After 40: What You Need to Know",
-      excerpt: "Age-specific strategies for maintaining and building muscle mass effectively. Understand how your body changes and adapt your training accordingly for optimal results.",
-      category: "Workouts",
-      readTime: "6 min read",
-      publishDate: "2024-01-10",
-      author: "Hamza",
-      image: "https://images.unsplash.com/photo-1583500178690-f7ff6d5d0e34?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      id: 4,
-      title: "The Psychology of Lasting Fitness Habits",
-      excerpt: "Why willpower isn't enough and how to create sustainable fitness habits that stick. Discover the mental strategies that separate successful people from those who quit.",
-      category: "Mindset",
-      readTime: "8 min read",
-      publishDate: "2024-01-08",
-      author: "Hamza",
-      image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      id: 5,
-      title: "Recovery 101: Why Rest Days Are Crucial for Your Progress",
-      excerpt: "Learn why recovery is just as important as your workouts and how to optimize your rest days. Master sleep, nutrition, and active recovery techniques.",
-      category: "Recovery",
-      readTime: "5 min read",
-      publishDate: "2024-01-05",
-      author: "Hamza",
-      image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      id: 6,
-      title: "Hydration and Performance: How Much Water Do You Really Need?",
-      excerpt: "The truth about hydration for fitness performance and optimal strategies. Cut through the myths and learn evidence-based hydration guidelines for athletes.",
-      category: "Nutrition",
-      readTime: "4 min read",
-      publishDate: "2024-01-01",
-      author: "Hamza",
-      image: "https://images.unsplash.com/photo-1550572017-edd951aa8e30?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-  ];
+  // Default fallback image
+  const defaultImage = "/hamza-bio.webp";
 
-  // Format date function to convert YYYY-MM-DD to readable format
-  const formatDate = (dateString: string): string => {
+  // Fetch blog posts from API
+  useEffect(() => {
+    const fetchBlogPosts = async () => {
+      try {
+        setLoading(true);
+        const url = selectedCategory === "All" 
+          ? '/api/blog'
+          : `/api/blog?category=${selectedCategory}`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch blog posts');
+        }
+        
+        const data = await response.json();
+        setBlogPosts(data);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error('Error fetching blog posts:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogPosts();
+  }, [selectedCategory]);
+
+  // Handle image errors
+  const handleImageError = (postId: string) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [postId]: true
+    }));
+  };
+
+  // Get image source with proper fallback
+  const getImageSrc = (post: BlogPost) => {
+    if (imageErrors[post.id]) return defaultImage;
+    if (post.image) {
+      // If it's a relative path, prefix with /
+      if (!post.image.startsWith('http') && !post.image.startsWith('/')) {
+        return `/${post.image}`;
+      }
+      return post.image;
+    }
+    return defaultImage;
+  };
+
+  // Format date function to convert ISO string to readable format
+  const formatDate = (dateString: string | null): string => {
+    if (!dateString) return 'No date';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -93,13 +103,13 @@ export default function BlogPage() {
     });
   };
 
+  // Filter posts based on search term
   const filteredPosts = blogPosts.filter((post) => {
-    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
     const matchesSearch =
       searchTerm === "" ||
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesSearch;
   });
 
   const getCategoryIcon = (category: string) => {
@@ -112,9 +122,38 @@ export default function BlogPage() {
     }
   };
 
-  const handleReadMore = (postId: number): void => {
-    window.location.href = `/blog/${postId}`;
+  const handleReadMore = (post: BlogPost): void => {
+    // Navigate using slug if available, otherwise use ID
+    const identifier = post.slug || post.id;
+    window.location.href = `/blog/${identifier}`;
   };
+
+  // Loading component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center py-12">
+      <div className="text-center">
+        <Loader2 className="h-8 w-8 animate-spin text-red-600 mx-auto mb-4" />
+        <p className="text-gray-600">Loading articles...</p>
+      </div>
+    </div>
+  );
+
+  // Error component
+  const ErrorMessage = () => (
+    <div className="text-center py-12">
+      <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <AlertCircle className="h-8 w-8 text-red-600" />
+      </div>
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Articles</h3>
+      <p className="text-gray-600 mb-4 px-4">{error}</p>
+      <button
+        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+        onClick={() => window.location.reload()}
+      >
+        Try Again
+      </button>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -122,7 +161,7 @@ export default function BlogPage() {
       <section className="py-12 sm:py-16 lg:py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 sm:space-y-6">
-            <div className="inline-flex items-center px-3 py-1.5 bg-red-600 text-white rounded-full text-sm font-medium">
+            <div className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-full text-sm font-medium shadow-lg">
               <BookOpen className="w-4 h-4 mr-2" />
               Fitness Blog
             </div>
@@ -135,7 +174,7 @@ export default function BlogPage() {
               Transform your fitness journey with proven strategies, workout tips, and nutrition guidance.
             </p>
             
-            <button className="inline-flex items-center px-6 py-3 bg-black text-white font-semibold rounded-lg hover:bg-red-600 cursor-pointer transition-colors">
+            <button className="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-lg hover:shadow-xl">
               <Target className="mr-2 h-5 w-5" />
               Start Your Transformation
             </button>
@@ -144,7 +183,7 @@ export default function BlogPage() {
       </section>
 
       {/* Search and Filter */}
-      <section className="py-6 sm:py-8 px-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+      <section className="py-6 sm:py-8 px-4 bg-white/70 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto">
           <div className="space-y-4 sm:space-y-6">
             {/* Search Bar */}
@@ -156,7 +195,7 @@ export default function BlogPage() {
                   placeholder="Search articles..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-red-600"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-colors shadow-sm"
                 />
               </div>
             </div>
@@ -169,10 +208,10 @@ export default function BlogPage() {
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`inline-flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-all ${
+                    className={`inline-flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-all duration-200 ${
                       selectedCategory === category
-                        ? "bg-red-600 text-white border-red-600"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-red-600"
+                        ? "bg-red-600 text-white border-red-600 shadow-lg"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-red-600 hover:text-red-600 shadow-sm"
                     }`}
                   >
                     <IconComponent className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -186,152 +225,173 @@ export default function BlogPage() {
       </section>
 
       {/* Blog Posts */}
-      <section className="py-8 sm:py-16 px-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+      <section className="py-8 sm:py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="mb-6 sm:mb-8">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
               {selectedCategory === "All" ? "All Articles" : `${selectedCategory} Articles`}
             </h2>
-            <p className="text-gray-600">
-              {filteredPosts.length} article{filteredPosts.length !== 1 ? "s" : ""} found
-            </p>
+            {!loading && (
+              <p className="text-gray-600">
+                {filteredPosts.length} article{filteredPosts.length !== 1 ? "s" : ""} found
+              </p>
+            )}
           </div>
 
-          <div className="space-y-4 sm:space-y-6">
-            {filteredPosts.map((post) => (
-              <div 
-                key={post.id} 
-                className="bg-white border border-gray-200 rounded-xl hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group"
-                onClick={() => handleReadMore(post.id)}
-              >
-                {/* Mobile Layout: Vertical Stack */}
-                <div className="block sm:hidden">
-                  {/* Image Section */}
-                  <div className="w-full h-48 relative overflow-hidden">
-                    <img 
-                      src={post.image} 
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-10 group-hover:bg-opacity-0 transition-all duration-300"></div>
-                  </div>
+          {/* Loading State */}
+          {loading && <LoadingSpinner />}
 
-                  {/* Content Section */}
-                  <div className="p-4">
-                    <div className="space-y-3">
-                      {/* Category Badge */}
-                      <span className="inline-flex items-center w-fit px-2 py-1 bg-gray-100 text-red-600 rounded-full text-xs font-medium">
-                        <Tag className="w-3 h-3 mr-1" />
-                        {post.category}
-                      </span>
+          {/* Error State */}
+          {error && !loading && <ErrorMessage />}
 
-                      {/* Title */}
-                      <h3 className="text-lg font-bold text-gray-900 leading-tight group-hover:text-red-600 transition-colors">
-                        {post.title}
-                      </h3>
-
-                      {/* Excerpt */}
-                      <p className="text-gray-600 leading-relaxed text-sm">
-                        {post.excerpt.length > 120 ? post.excerpt.substring(0, 120) + '...' : post.excerpt}
-                      </p>
-
-                      {/* Meta Info */}
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>{formatDate(post.publishDate)}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>{post.readTime}</span>
-                        </div>
-                      </div>
-
-                      {/* Read More Button */}
-                      <button
-                        className="flex items-center text-red-600 hover:text-red-800 font-semibold text-sm transition-colors mt-3"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleReadMore(post.id);
-                        }}
-                      >
-                        Read More
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Desktop Layout: Horizontal */}
-                <div className="hidden sm:block">
-                  <div className="flex h-64 lg:h-72">
+          {/* Blog Posts Grid */}
+          {!loading && !error && (
+            <div className="grid gap-6 md:gap-8">
+              {filteredPosts.map((post) => (
+                <article 
+                  key={post.id} 
+                  className="bg-white border border-gray-200 rounded-2xl hover:shadow-2xl transition-all duration-300 cursor-pointer overflow-hidden group"
+                  onClick={() => handleReadMore(post)}
+                >
+                  {/* Mobile Layout: Vertical Stack */}
+                  <div className="block lg:hidden">
                     {/* Image Section */}
-                    <div className="w-1/3 relative overflow-hidden">
+                    <div className="w-full h-48 relative overflow-hidden">
                       <img 
-                        src={post.image} 
+                        src={getImageSrc(post)}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={() => handleImageError(post.id)}
+                        loading="lazy"
                       />
-                      <div className="absolute inset-0 bg-black bg-opacity-10 group-hover:bg-opacity-0 transition-all duration-300"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
 
                     {/* Content Section */}
-                    <div className="w-2/3 p-6 lg:p-8 flex flex-col justify-center">
-                      <div className="space-y-4">
+                    <div className="p-4 sm:p-6">
+                      <div className="space-y-3">
                         {/* Category Badge */}
-                        <span className="inline-flex items-center w-fit px-3 py-1.5 bg-gray-100 text-red-600 rounded-full text-sm font-medium">
+                        <span className="inline-flex items-center w-fit px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-medium">
                           <Tag className="w-3 h-3 mr-1" />
                           {post.category}
                         </span>
 
                         {/* Title */}
-                        <h3 className="text-xl lg:text-2xl font-bold text-gray-900 leading-tight group-hover:text-red-600 transition-colors">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight group-hover:text-red-600 transition-colors duration-200">
                           {post.title}
                         </h3>
 
                         {/* Excerpt */}
-                        <p className="text-gray-600 leading-relaxed text-sm lg:text-base">
-                          {post.excerpt}
+                        <p className="text-gray-600 leading-relaxed text-sm">
+                          {post.excerpt.length > 120 ? post.excerpt.substring(0, 120) + '...' : post.excerpt}
                         </p>
 
-                        {/* Meta Info and Read More */}
-                        <div className="flex items-center justify-between pt-2">
-                          <div className="flex items-center gap-4 lg:gap-6 text-sm text-gray-500">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4" />
-                              <span>{formatDate(post.publishDate)}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              <span>{post.readTime}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <User className="h-4 w-4" />
-                              <span>{post.author}</span>
-                            </div>
+                        {/* Meta Info */}
+                        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3 text-red-600" />
+                            <span>{formatDate(post.publishedAt)}</span>
                           </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3 text-red-600" />
+                            <span>{post.readTime}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <User className="h-3 w-3 text-red-600" />
+                            <span>{post.author}</span>
+                          </div>
+                        </div>
 
+                        {/* Read More Button */}
+                        <div className="pt-2">
                           <button
-                            className="flex items-center text-red-600 hover:text-red-800 font-semibold text-sm lg:text-base transition-colors"
+                            className="inline-flex items-center text-red-600 hover:text-red-800 font-semibold text-sm transition-colors duration-200"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleReadMore(post.id);
+                              handleReadMore(post);
                             }}
                           >
                             Read More
-                            <ArrowRight className="ml-2 h-4 w-4" />
+                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                           </button>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+
+                  {/* Desktop Layout: Horizontal */}
+                  <div className="hidden lg:block">
+                    <div className="flex h-64 xl:h-72">
+                      {/* Image Section */}
+                      <div className="w-1/3 relative overflow-hidden">
+                        <img 
+                          src={getImageSrc(post)}
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={() => handleImageError(post.id)}
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </div>
+
+                      {/* Content Section */}
+                      <div className="w-2/3 p-6 xl:p-8 flex flex-col justify-center">
+                        <div className="space-y-4">
+                          {/* Category Badge */}
+                          <span className="inline-flex items-center w-fit px-3 py-1.5 bg-red-50 text-red-600 rounded-full text-sm font-medium">
+                            <Tag className="w-3 h-3 mr-2" />
+                            {post.category}
+                          </span>
+
+                          {/* Title */}
+                          <h3 className="text-xl xl:text-2xl font-bold text-gray-900 leading-tight group-hover:text-red-600 transition-colors duration-200">
+                            {post.title}
+                          </h3>
+
+                          {/* Excerpt */}
+                          <p className="text-gray-600 leading-relaxed text-sm xl:text-base">
+                            {post.excerpt}
+                          </p>
+
+                          {/* Meta Info and Read More */}
+                          <div className="flex items-center justify-between pt-2">
+                            <div className="flex items-center gap-4 xl:gap-6 text-sm text-gray-500">
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4 text-red-600" />
+                                <span>{formatDate(post.publishedAt)}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-4 w-4 text-red-600" />
+                                <span>{post.readTime}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <User className="h-4 w-4 text-red-600" />
+                                <span>{post.author}</span>
+                              </div>
+                            </div>
+
+                            <button
+                              className="inline-flex items-center text-red-600 hover:text-red-800 font-semibold text-sm xl:text-base transition-colors duration-200"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleReadMore(post);
+                              }}
+                            >
+                              Read More
+                              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
 
           {/* No Results */}
-          {filteredPosts.length === 0 && (
+          {!loading && !error && filteredPosts.length === 0 && (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="h-8 w-8 text-gray-400" />
@@ -341,7 +401,7 @@ export default function BlogPage() {
                 Try adjusting your search terms or selecting a different category.
               </p>
               <button
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                 onClick={() => {
                   setSearchTerm("");
                   setSelectedCategory("All");

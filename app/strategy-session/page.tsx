@@ -16,12 +16,16 @@ import {
   Scale,
   Trophy,
   Clock,
-  Heart
+  Heart,
+  Loader2
 } from "lucide-react"
 import { useState } from "react"
 
 export default function CoachingApplicationForm() {
   const [currentStep, setCurrentStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState("")
+  const [submitSuccess, setSubmitSuccess] = useState(false)
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -106,10 +110,34 @@ export default function CoachingApplicationForm() {
     }
   }
 
-  const handleSubmit = () => {
-    console.log("Application submitted:", formData)
-    // Handle form submission here
-    alert("Application submitted successfully! We'll get back to you within 24 hours.")
+  const handleSubmit = async () => {
+    setIsSubmitting(true)
+    setSubmitError("")
+    
+    try {
+      const response = await fetch('/api/strategy-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit application')
+      }
+
+      setSubmitSuccess(true)
+      console.log("Application submitted successfully:", data)
+      
+    } catch (error) {
+      console.error('Error submitting application:', error)
+      setSubmitError(error instanceof Error ? error.message : 'An unexpected error occurred')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const isStepValid = () => {
@@ -129,6 +157,49 @@ export default function CoachingApplicationForm() {
       default:
         return true
     }
+  }
+
+  // Success screen
+  if (submitSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10 flex items-center justify-center py-8">
+        <div className="container mx-auto px-4 max-w-2xl">
+          <Card className="border border-border bg-card shadow-lg">
+            <CardContent className="p-8 text-center">
+              <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-2">Application Submitted Successfully!</h2>
+              <p className="text-muted-foreground mb-6">
+                Thank you for your application. We'll review your information and get back to you within 24 hours.
+              </p>
+              <Button
+                onClick={() => {
+                  setSubmitSuccess(false)
+                  setCurrentStep(1)
+                  setFormData({
+                    firstName: "",
+                    lastName: "",
+                    email: "",
+                    phone: "",
+                    age: "",
+                    currentState: "",
+                    primaryGoal: "",
+                    timeFrame: "",
+                    experience: "",
+                    availability: "",
+                    hasMedicalCondition: "",
+                    medicalDetails: "",
+                    motivation: ""
+                  })
+                }}
+                variant="outline"
+              >
+                Submit Another Application
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
   }
 
   const renderStep = () => {
@@ -431,7 +502,7 @@ export default function CoachingApplicationForm() {
                       onChange={handleInputChange}
                       rows={4}
                       className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
-                      placeholder="Please describe any medical conditions, past injuries, physical limitations . This information helps us create a safe and effective plan tailored to your needs."
+                      placeholder="Please describe any medical conditions, past injuries, physical limitations. This information helps us create a safe and effective plan tailored to your needs."
                     />
                   </div>
                 )}
@@ -487,12 +558,19 @@ export default function CoachingApplicationForm() {
           <CardContent className="p-8">
             {renderStep()}
             
+            {/* Error Message */}
+            {submitError && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-600 text-sm">{submitError}</p>
+              </div>
+            )}
+            
             {/* Navigation Buttons */}
             <div className="flex justify-between mt-8 pt-6 border-t border-border">
               <Button
                 onClick={prevStep}
                 variant="outline"
-                disabled={currentStep === 1}
+                disabled={currentStep === 1 || isSubmitting}
                 className="flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -502,7 +580,7 @@ export default function CoachingApplicationForm() {
               {currentStep < totalSteps ? (
                 <Button
                   onClick={nextStep}
-                  disabled={!isStepValid()}
+                  disabled={!isStepValid() || isSubmitting}
                   className="flex items-center gap-2 !bg-black !text-white hover:!bg-gray-800"
                 >
                   Next
@@ -511,23 +589,26 @@ export default function CoachingApplicationForm() {
               ) : (
                 <Button
                   onClick={handleSubmit}
-                  disabled={!isStepValid()}
-                  className="flex items-center gap-2 !bg-green-600 !text-white hover:!bg-green-700"
+                  disabled={!isStepValid() || isSubmitting}
+                  className="flex items-center gap-2 !bg-green-600 !text-white hover:!bg-green-700 disabled:opacity-50"
                 >
-                  <CheckCircle className="w-4 h-4" />
-                  Submit Application
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      Submit Application
+                    </>
+                  )}
                 </Button>
               )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-sm text-muted-foreground">
-            Your information is secure and will only be used to create your personalized coaching plan.
-          </p>
-        </div>
       </div>
     </div>
 

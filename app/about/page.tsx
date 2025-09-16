@@ -31,7 +31,7 @@ export default function AboutPage() {
               
               {/* Simple floating badge */}
               <div className="absolute -top-4 -right-4 bg-black text-white px-4 py-2 rounded-full text-sm font-semibold">
-                10+ Years Experience
+                15+ Years Experience
               </div>
             </div>
 
@@ -121,13 +121,14 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-8 text-center">
-                <Award className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">NASM-CPT Certified</h3>
-                <p className="text-gray-600 text-sm">
-                  National Academy of Sports Medicine Certified Personal Trainer
-                </p>
-              </CardContent>
+            <CardContent className="p-8 text-center">
+            <Award className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Certified Personal Trainer</h3>
+            <p className="text-gray-600 text-sm">
+              Recognized certification in personal training and fitness coaching
+            </p>
+          </CardContent>
+
             </Card>
 
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
