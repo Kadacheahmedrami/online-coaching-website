@@ -1,5 +1,5 @@
-// HamzaGym.com Simplified Database Schema
-// Minimal schema with just BlogPost and Application
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -10,59 +10,144 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// All content: blog posts, success stories, and free downloads
+model CoachingApplication {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Personal Information
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  age       Int
+
+  // Fitness Information
+  currentState       String // overweight, skinny, lean, muscular, average, obese
+  primaryGoal        String // weight_loss, muscle_gain, strength, endurance, toning, general_fitness
+  timeFrame          String // 3_months, 6_months, 12_months, ongoing
+  experience         String // beginner, some, intermediate, advanced
+  availability       String // 3_days, 4_days, 5_days, 6_days, daily
+  hasMedicalCondition String // yes, no
+  medicalDetails     String?
+  motivation         String?
+
+  // Application Status
+  status String @default("pending") // pending, approved, rejected, contacted
+
+  @@map("coaching_applications")
+}
+
 model BlogPost {
   id          String   @id @default(cuid())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+  publishedAt DateTime?
+
   // Content
   title       String
   slug        String   @unique
-  content     String
-  excerpt     String?
-  
-  // Type of content
-  type        PostType @default(BLOG)
-  
-  // Media
+  excerpt     String
+  content     String?
   image       String?
   
-  // Publishing
+  // Metadata
+  category    String // Workouts, Nutrition, Mindset, Recovery
+  readTime    String // "5 min read"
+  author      String @default("Hamza")
   published   Boolean @default(false)
-  featured    Boolean @default(false)
   
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+
   @@map("blog_posts")
 }
 
-enum PostType {
-  BLOG           // Regular blog posts
-  SUCCESS_STORY  // Client transformations
-  FREE_CONTENT   // Lead magnets, free downloads
+model SuccessStory {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Basic Information
+  name        String
+  achievement String
+  age         Int?
+  height      String?
+  duration    String
+  program     String
+
+  // Images
+  beforeImage String
+  afterImage  String
+  additionalImages String[] // JSON array of image URLs
+
+  // Stats
+  startWeight String
+  endWeight   String
+  stats       String // "25kg Lost • 12% Body Fat Reduced"
+
+  // Testimonials
+  testimonial         String
+  detailedTestimonial String?
+
+  // Detailed Data (stored as JSON for flexibility)
+  beforeStats  Json? // { weight, bodyFat, muscle, waist }
+  afterStats   Json? // { weight, bodyFat, muscle, waist }
+  measurements Json? // { chest: { before, after }, waist: { before, after }, ... }
+  timeline     Json? // [{ week, weight, bodyFat, note }]
+  goals        Json? // ["Lose weight", "Build confidence"]
+  challenges   Json? // ["Emotional eating", "Time management"]
+  keyFactors   Json? // ["Consistent tracking", "Progressive training"]
+
+  // Status
+  featured  Boolean @default(false)
+  published Boolean @default(true)
+
+  @@map("success_stories")
 }
 
-// Client applications for consultations
-model StrategySession {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  
-  // Personal Info
-  name        String
-  email       String
-  phone       String
-  
-  // Fitness Info
-  goal        String   // What they want to achieve
-  experience  String   // Beginner/Intermediate/Advanced
-  budget      String   // Budget range
-  
-  // Consultation
-  date        DateTime?
-  time        String?
+model FAQ {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Content
+  question String
+  answer   String
+  category String // Getting Started, Training, Nutrition, Pricing, Support
   
   // Status
-  status      String   @default("pending") // pending, reviewed, called, converted
-  notes       String?
+  popular   Boolean @default(false)
+  published Boolean @default(true)
+  order     Int?    // For manual ordering within categories
+
+  @@map("faqs")
+}
+
+model FreeResource {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Basic Info
+  title       String
+  description String
+  type        String // PDF Guide, Video Series, Video Library, Digital Toolkit
+  duration    String // 4 weeks, 2 hours, 30+ videos, Lifetime access
   
-  @@map("StrategySession")
+  // Content
+  features    Json   // ["20+ exercises with instructions", "4-week progressive program"]
+  fileUrl     String? // URL to the actual file/resource
+  thumbnailUrl String? // Preview image
+  
+  // Stats
+  downloadCount Int @default(0)
+  
+  // Status
+  published Boolean @default(true)
+  featured  Boolean @default(false)
+  order     Int?    // For manual ordering
+
+  @@map("free_resources")
 }

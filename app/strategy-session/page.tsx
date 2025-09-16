@@ -33,8 +33,9 @@ export default function CoachingApplicationForm() {
     timeFrame: "",
     experience: "",
     availability: "",
-    motivation: "",
-    challenges: ""
+    hasMedicalCondition: "",
+    medicalDetails: "",
+    motivation: ""
   })
 
   const totalSteps = 6
@@ -124,7 +125,7 @@ export default function CoachingApplicationForm() {
       case 5:
         return formData.experience && formData.availability
       case 6:
-        return formData.motivation && formData.challenges
+        return formData.hasMedicalCondition && (formData.hasMedicalCondition === "no" || formData.medicalDetails)
       default:
         return true
     }
@@ -380,38 +381,74 @@ export default function CoachingApplicationForm() {
           <div className="space-y-6">
             <div className="text-center space-y-2">
               <Heart className="w-12 h-12 text-accent mx-auto" />
-              <h2 className="text-2xl font-bold">Motivation & Challenges</h2>
-              <p className="text-muted-foreground">Help us understand your journey better</p>
+              <h2 className="text-2xl font-bold">Health & Motivation</h2>
+              <p className="text-muted-foreground">Help us understand your health status and goals</p>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <label className="text-sm font-medium">
+                  Do you have any medical conditions, injuries, or physical limitations we should be aware of? *
+                </label>
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleOptionSelect("hasMedicalCondition", "no")
+                      setFormData(prev => ({ ...prev, medicalDetails: "" }))
+                    }}
+                    className={`w-full p-3 border rounded-lg transition-all text-left hover:border-accent ${
+                      formData.hasMedicalCondition === "no"
+                        ? "border-accent bg-accent/10 text-accent"
+                        : "border-border text-foreground"
+                    }`}
+                  >
+                    <span className="font-medium">No, I have no medical conditions or limitations</span>
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => handleOptionSelect("hasMedicalCondition", "yes")}
+                    className={`w-full p-3 border rounded-lg transition-all text-left hover:border-accent ${
+                      formData.hasMedicalCondition === "yes"
+                        ? "border-accent bg-accent/10 text-accent"
+                        : "border-border text-foreground"
+                    }`}
+                  >
+                    <span className="font-medium">Yes, I have medical conditions or limitations to discuss</span>
+                  </button>
+                </div>
+                
+                {formData.hasMedicalCondition === "yes" && (
+                  <div className="space-y-2">
+                    <label htmlFor="medicalDetails" className="text-sm font-medium">
+                      Please provide details about your medical conditions or limitations *
+                    </label>
+                    <textarea
+                      id="medicalDetails"
+                      name="medicalDetails"
+                      value={formData.medicalDetails}
+                      onChange={handleInputChange}
+                      rows={4}
+                      className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
+                      placeholder="Please describe any medical conditions, past injuries, physical limitations . This information helps us create a safe and effective plan tailored to your needs."
+                    />
+                  </div>
+                )}
+              </div>
+              
               <div className="space-y-2">
                 <label htmlFor="motivation" className="text-sm font-medium">
-                  What motivates you to start this fitness journey? *
+                  What motivates you to start this fitness journey? (Optional)
                 </label>
                 <textarea
                   id="motivation"
                   name="motivation"
                   value={formData.motivation}
                   onChange={handleInputChange}
-                  rows={4}
+                  rows={3}
                   className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
-                  placeholder="Share what drives you to make this change..."
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="challenges" className="text-sm font-medium">
-                  What challenges have you faced in the past? *
-                </label>
-                <textarea
-                  id="challenges"
-                  name="challenges"
-                  value={formData.challenges}
-                  onChange={handleInputChange}
-                  rows={4}
-                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
-                  placeholder="Tell us about any obstacles you've encountered..."
+                  placeholder="Share what drives you to make this change (optional)..."
                 />
               </div>
             </div>
@@ -426,11 +463,6 @@ export default function CoachingApplicationForm() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10 py-8">
       <div className="container mx-auto px-4 max-w-2xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Online Coaching Application</h1>
-          <p className="text-muted-foreground">Transform your fitness journey with personalized coaching</p>
-        </div>
 
         {/* Progress Bar */}
         <div className="mb-8">

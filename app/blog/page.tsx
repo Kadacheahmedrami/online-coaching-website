@@ -112,26 +112,26 @@ export default function BlogPage() {
     }
   };
 
-  const handleReadMore = (postId: number) => {
+  const handleReadMore = (postId: number): void => {
     window.location.href = `/blog/${postId}`;
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       {/* Hero Section */}
-      <section className="py-16 sm:py-24">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center space-y-6">
+      <section className="py-12 sm:py-16 lg:py-24 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center space-y-4 sm:space-y-6">
             <div className="inline-flex items-center px-3 py-1.5 bg-red-600 text-white rounded-full text-sm font-medium">
               <BookOpen className="w-4 h-4 mr-2" />
               Fitness Blog
             </div>
             
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-gray-900 px-2">
               Expert Fitness <span className="text-red-600">Insights</span>
             </h1>
             
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto px-4">
               Transform your fitness journey with proven strategies, workout tips, and nutrition guidance.
             </p>
             
@@ -144,9 +144,9 @@ export default function BlogPage() {
       </section>
 
       {/* Search and Filter */}
-      <section className="py-8" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="space-y-6">
+      <section className="py-6 sm:py-8 px-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="space-y-4 sm:space-y-6">
             {/* Search Bar */}
             <div className="max-w-md mx-auto">
               <div className="relative">
@@ -162,20 +162,20 @@ export default function BlogPage() {
             </div>
 
             {/* Category Filter */}
-            <div className="flex flex-wrap justify-center gap-3">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 px-2">
               {categories.map((category) => {
                 const IconComponent = getCategoryIcon(category);
                 return (
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
+                    className={`inline-flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-all ${
                       selectedCategory === category
                         ? "bg-red-600 text-white border-red-600"
                         : "bg-white text-gray-700 border-gray-200 hover:border-red-600"
                     }`}
                   >
-                    <IconComponent className="w-4 h-4 mr-2" />
+                    <IconComponent className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     {category}
                   </button>
                 );
@@ -186,10 +186,10 @@ export default function BlogPage() {
       </section>
 
       {/* Blog Posts */}
-      <section className="py-16" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <section className="py-8 sm:py-16 px-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
               {selectedCategory === "All" ? "All Articles" : `${selectedCategory} Articles`}
             </h2>
             <p className="text-gray-600">
@@ -197,16 +197,17 @@ export default function BlogPage() {
             </p>
           </div>
 
-          <div className="space-y-6">
-            {filteredPosts.map((post, index) => (
+          <div className="space-y-4 sm:space-y-6">
+            {filteredPosts.map((post) => (
               <div 
                 key={post.id} 
                 className="bg-white border border-gray-200 rounded-xl hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group"
                 onClick={() => handleReadMore(post.id)}
               >
-                <div className={`flex ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'} h-64 sm:h-72`}>
+                {/* Mobile Layout: Vertical Stack */}
+                <div className="block sm:hidden">
                   {/* Image Section */}
-                  <div className="w-1/3 relative overflow-hidden">
+                  <div className="w-full h-48 relative overflow-hidden">
                     <img 
                       src={post.image} 
                       alt={post.title}
@@ -216,51 +217,111 @@ export default function BlogPage() {
                   </div>
 
                   {/* Content Section */}
-                  <div className="w-2/3 p-6 sm:p-8 flex flex-col justify-center">
-                    <div className="space-y-4">
+                  <div className="p-4">
+                    <div className="space-y-3">
                       {/* Category Badge */}
-                      <span className="inline-flex items-center w-fit px-3 py-1.5 bg-gray-100 text-red-600 rounded-full text-sm font-medium">
+                      <span className="inline-flex items-center w-fit px-2 py-1 bg-gray-100 text-red-600 rounded-full text-xs font-medium">
                         <Tag className="w-3 h-3 mr-1" />
                         {post.category}
                       </span>
 
                       {/* Title */}
-                      <h3 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight group-hover:text-red-600 transition-colors">
+                      <h3 className="text-lg font-bold text-gray-900 leading-tight group-hover:text-red-600 transition-colors">
                         {post.title}
                       </h3>
 
                       {/* Excerpt */}
-                      <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                        {post.excerpt}
+                      <p className="text-gray-600 leading-relaxed text-sm">
+                        {post.excerpt.length > 120 ? post.excerpt.substring(0, 120) + '...' : post.excerpt}
                       </p>
 
-                      {/* Meta Info and Read More */}
-                      <div className="flex items-center justify-between pt-2">
-                        <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <span>{formatDate(post.publishDate)}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <span>{post.readTime}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <User className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <span>{post.author}</span>
-                          </div>
+                      {/* Meta Info */}
+                      <div className="flex items-center gap-3 text-xs text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          <span>{formatDate(post.publishDate)}</span>
                         </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          <span>{post.readTime}</span>
+                        </div>
+                      </div>
 
-                        <button
-                          className="flex items-center text-red-600 hover:text-red-800 font-semibold text-sm sm:text-base transition-colors"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleReadMore(post.id);
-                          }}
-                        >
-                          Read More
-                          <ArrowRight className="ml-1 sm:ml-2 h-4 w-4" />
-                        </button>
+                      {/* Read More Button */}
+                      <button
+                        className="flex items-center text-red-600 hover:text-red-800 font-semibold text-sm transition-colors mt-3"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleReadMore(post.id);
+                        }}
+                      >
+                        Read More
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Layout: Horizontal */}
+                <div className="hidden sm:block">
+                  <div className="flex h-64 lg:h-72">
+                    {/* Image Section */}
+                    <div className="w-1/3 relative overflow-hidden">
+                      <img 
+                        src={post.image} 
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-10 group-hover:bg-opacity-0 transition-all duration-300"></div>
+                    </div>
+
+                    {/* Content Section */}
+                    <div className="w-2/3 p-6 lg:p-8 flex flex-col justify-center">
+                      <div className="space-y-4">
+                        {/* Category Badge */}
+                        <span className="inline-flex items-center w-fit px-3 py-1.5 bg-gray-100 text-red-600 rounded-full text-sm font-medium">
+                          <Tag className="w-3 h-3 mr-1" />
+                          {post.category}
+                        </span>
+
+                        {/* Title */}
+                        <h3 className="text-xl lg:text-2xl font-bold text-gray-900 leading-tight group-hover:text-red-600 transition-colors">
+                          {post.title}
+                        </h3>
+
+                        {/* Excerpt */}
+                        <p className="text-gray-600 leading-relaxed text-sm lg:text-base">
+                          {post.excerpt}
+                        </p>
+
+                        {/* Meta Info and Read More */}
+                        <div className="flex items-center justify-between pt-2">
+                          <div className="flex items-center gap-4 lg:gap-6 text-sm text-gray-500">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              <span>{formatDate(post.publishDate)}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              <span>{post.readTime}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <User className="h-4 w-4" />
+                              <span>{post.author}</span>
+                            </div>
+                          </div>
+
+                          <button
+                            className="flex items-center text-red-600 hover:text-red-800 font-semibold text-sm lg:text-base transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleReadMore(post.id);
+                            }}
+                          >
+                            Read More
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -276,7 +337,7 @@ export default function BlogPage() {
                 <Search className="h-8 w-8 text-gray-400" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No articles found</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 mb-4 px-4">
                 Try adjusting your search terms or selecting a different category.
               </p>
               <button
