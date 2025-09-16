@@ -32,11 +32,12 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="md:hidden">
-          <Button variant="ghost" size="sm" className="p-2" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
-        </div>
+
+     <div className="md:hidden">
+  <Button variant="ghost" size="sm" className=" h-12 border cursor-pointer w-12 text-2xl font-bold" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+    {isMobileMenuOpen ? <X className="h-12 w-12" /> : <Menu className="h-12 w-12" />}
+  </Button>
+</div>
 
         <Button className="hidden md:flex !bg-accent !text-white hover:!bg-red-800 rounded-lg px-4 md:px-5 lg:px-6 py-2 text-sm font-medium shadow-sm transition-colors hover:scale-105">
           <a href="/strategy-session">Book Strategy Session</a>
