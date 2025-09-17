@@ -86,7 +86,7 @@ export default function AboutSection() {
                   icon: Trophy,
                   iconBg: "bg-primary/20",
                   iconColor: "text-primary",
-                  title: "500+ Success Stories",
+                  title: "100+ Success Stories",
                   subtitle: "Proven track record of client transformations",
                   delay: "delay-500"
                 },

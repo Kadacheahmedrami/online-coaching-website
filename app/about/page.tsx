@@ -62,7 +62,7 @@ export default function AboutPage() {
               {/* Simple stats */}
               <div className="grid grid-cols-2 gap-6 pt-8 border-t">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-900">500+</div>
+                  <div className="text-3xl font-bold text-gray-900">1000+</div>
                   <div className="text-sm text-gray-600">Clients Transformed</div>
                 </div>
                 <div className="text-center">
@@ -146,7 +146,7 @@ export default function AboutPage() {
                 <Trophy className="h-12 w-12 text-yellow-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">10+ Years Experience</h3>
                 <p className="text-gray-600 text-sm">
-                  Proven track record with 500+ transformations
+                  Proven track record with 1000+ transformations
                 </p>
               </CardContent>
             </Card>
