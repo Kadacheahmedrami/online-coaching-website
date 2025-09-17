@@ -14,6 +14,8 @@ import {
   Tag,
   Loader2,
   AlertCircle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 // Type definitions
@@ -30,10 +32,32 @@ interface BlogPost {
   createdAt: string;
 }
 
+interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  limit: number;
+}
+
+interface BlogApiResponse {
+  posts: BlogPost[];
+  pagination: PaginationInfo;
+}
+
 export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+    limit: 5
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>({});
@@ -44,32 +68,48 @@ export default function BlogPage() {
   const defaultImage = "/hamza-bio.webp";
 
   // Fetch blog posts from API
-  useEffect(() => {
-    const fetchBlogPosts = async () => {
-      try {
-        setLoading(true);
-        const url = selectedCategory === "All" 
-          ? '/api/blog'
-          : `/api/blog?category=${selectedCategory}`;
-        
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Failed to fetch blog posts');
-        }
-        
-        const data = await response.json();
-        setBlogPosts(data);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        console.error('Error fetching blog posts:', err);
-      } finally {
-        setLoading(false);
+  const fetchBlogPosts = async (page: number = 1, category: string = selectedCategory) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      let url = `/api/blog?page=${page}&limit=5`;
+      if (category !== "All") {
+        url += `&category=${category}`;
       }
-    };
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch blog posts');
+      }
+      
+      const data: BlogApiResponse = await response.json();
+      setBlogPosts(data.posts);
+      setPagination(data.pagination);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error fetching blog posts:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchBlogPosts();
+  // Initial fetch and category changes
+  useEffect(() => {
+    fetchBlogPosts(1, selectedCategory);
   }, [selectedCategory]);
+
+  // Handle page changes
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= pagination.totalPages && !loading) {
+      fetchBlogPosts(page, selectedCategory);
+      // Scroll to top of blog posts section
+      const element = document.getElementById('blog-posts-section');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   // Handle image errors
   const handleImageError = (postId: string) => {
@@ -103,7 +143,7 @@ export default function BlogPage() {
     });
   };
 
-  // Filter posts based on search term
+  // Filter posts based on search term (client-side search)
   const filteredPosts = blogPosts.filter((post) => {
     const matchesSearch =
       searchTerm === "" ||
@@ -128,6 +168,109 @@ export default function BlogPage() {
     window.location.href = `/blog/${identifier}`;
   };
 
+  // Pagination component
+  const PaginationControls = () => {
+    if (pagination.totalCount === 0) return null;
+    
+    return (
+      <div className="flex flex-col items-center gap-6 py-8 border-t border-gray-200 mt-8">
+        {/* Page Info */}
+        <div className="text-sm text-gray-600">
+          Showing page {pagination.currentPage} of {pagination.totalPages} 
+          ({pagination.totalCount} total articles)
+        </div>
+
+        {/* Pagination Buttons */}
+        <div className="flex items-center gap-2">
+          {/* Previous Button */}
+          <button
+            onClick={() => goToPage(pagination.currentPage - 1)}
+            disabled={!pagination.hasPrevPage || loading}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Previous
+          </button>
+
+          {/* Page Numbers */}
+          <div className="flex items-center gap-1 mx-4">
+            {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+              let pageNum;
+              if (pagination.totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (pagination.currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (pagination.currentPage >= pagination.totalPages - 2) {
+                pageNum = pagination.totalPages - 4 + i;
+              } else {
+                pageNum = pagination.currentPage - 2 + i;
+              }
+
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => goToPage(pageNum)}
+                  disabled={loading}
+                  className={`w-10 h-10 rounded-lg font-medium transition-colors duration-200 ${
+                    pageNum === pagination.currentPage
+                      ? "bg-red-600 text-white"
+                      : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Next Button */}
+          <button
+            onClick={() => goToPage(pagination.currentPage + 1)}
+            disabled={!pagination.hasNextPage || loading}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          >
+            Next
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Quick Jump (for many pages) */}
+        {pagination.totalPages > 5 && (
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            <span>Quick jump:</span>
+            <div className="flex gap-1">
+              {pagination.currentPage > 3 && (
+                <>
+                  <button
+                    onClick={() => goToPage(1)}
+                    disabled={loading}
+                    className="px-2 py-1 text-xs text-gray-600 hover:text-red-600 transition-colors duration-200"
+                  >
+                    First
+                  </button>
+                  {pagination.currentPage > 4 && <span className="px-1">...</span>}
+                </>
+              )}
+              
+              {pagination.currentPage < pagination.totalPages - 2 && (
+                <>
+                  {pagination.currentPage < pagination.totalPages - 3 && <span className="px-1">...</span>}
+                  <button
+                    onClick={() => goToPage(pagination.totalPages)}
+                    disabled={loading}
+                    className="px-2 py-1 text-xs text-gray-600 hover:text-red-600 transition-colors duration-200"
+                  >
+                    Last
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Loading component
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center py-12">
@@ -148,7 +291,7 @@ export default function BlogPage() {
       <p className="text-gray-600 mb-4 px-4">{error}</p>
       <button
         className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
-        onClick={() => window.location.reload()}
+        onClick={() => fetchBlogPosts(1, selectedCategory)}
       >
         Try Again
       </button>
@@ -208,7 +351,8 @@ export default function BlogPage() {
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`inline-flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-all duration-200 ${
+                    disabled={loading}
+                    className={`inline-flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
                       selectedCategory === category
                         ? "bg-red-600 text-white border-red-600 shadow-lg"
                         : "bg-white text-gray-700 border-gray-200 hover:border-red-600 hover:text-red-600 shadow-sm"
@@ -225,7 +369,7 @@ export default function BlogPage() {
       </section>
 
       {/* Blog Posts */}
-      <section className="py-8 sm:py-16 px-4">
+      <section id="blog-posts-section" className="py-8 sm:py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="mb-6 sm:mb-8">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
@@ -233,7 +377,10 @@ export default function BlogPage() {
             </h2>
             {!loading && (
               <p className="text-gray-600">
-                {filteredPosts.length} article{filteredPosts.length !== 1 ? "s" : ""} found
+                {pagination.totalCount} article{pagination.totalCount !== 1 ? "s" : ""} found
+                {searchTerm && filteredPosts.length !== blogPosts.length && (
+                  <span> ({filteredPosts.length} matching search)</span>
+                )}
               </p>
             )}
           </div>
@@ -246,84 +393,18 @@ export default function BlogPage() {
 
           {/* Blog Posts Grid */}
           {!loading && !error && (
-            <div className="grid gap-6 md:gap-8">
-              {filteredPosts.map((post) => (
-                <article 
-                  key={post.id} 
-                  className="bg-white border border-gray-200 rounded-2xl hover:shadow-2xl transition-all duration-300 cursor-pointer overflow-hidden group"
-                  onClick={() => handleReadMore(post)}
-                >
-                  {/* Mobile Layout: Vertical Stack */}
-                  <div className="block lg:hidden">
-                    {/* Image Section */}
-                    <div className="w-full h-48 relative overflow-hidden">
-                      <img 
-                        src={getImageSrc(post)}
-                        alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onError={() => handleImageError(post.id)}
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </div>
-
-                    {/* Content Section */}
-                    <div className="p-4 sm:p-6">
-                      <div className="space-y-3">
-                        {/* Category Badge */}
-                        <span className="inline-flex items-center w-fit px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-medium">
-                          <Tag className="w-3 h-3 mr-1" />
-                          {post.category}
-                        </span>
-
-                        {/* Title */}
-                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight group-hover:text-red-600 transition-colors duration-200">
-                          {post.title}
-                        </h3>
-
-                        {/* Excerpt */}
-                        <p className="text-gray-600 leading-relaxed text-sm">
-                          {post.excerpt.length > 120 ? post.excerpt.substring(0, 120) + '...' : post.excerpt}
-                        </p>
-
-                        {/* Meta Info */}
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3 text-red-600" />
-                            <span>{formatDate(post.publishedAt)}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3 text-red-600" />
-                            <span>{post.readTime}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <User className="h-3 w-3 text-red-600" />
-                            <span>{post.author}</span>
-                          </div>
-                        </div>
-
-                        {/* Read More Button */}
-                        <div className="pt-2">
-                          <button
-                            className="inline-flex items-center text-red-600 hover:text-red-800 font-semibold text-sm transition-colors duration-200"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleReadMore(post);
-                            }}
-                          >
-                            Read More
-                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Desktop Layout: Horizontal */}
-                  <div className="hidden lg:block">
-                    <div className="flex h-64 xl:h-72">
+            <>
+              <div className="grid gap-6 md:gap-8">
+                {filteredPosts.map((post) => (
+                  <article 
+                    key={post.id} 
+                    className="bg-white border border-gray-200 rounded-2xl hover:shadow-2xl transition-all duration-300 cursor-pointer overflow-hidden group"
+                    onClick={() => handleReadMore(post)}
+                  >
+                    {/* Mobile Layout: Vertical Stack */}
+                    <div className="block lg:hidden">
                       {/* Image Section */}
-                      <div className="w-1/3 relative overflow-hidden">
+                      <div className="w-full h-48 relative overflow-hidden">
                         <img 
                           src={getImageSrc(post)}
                           alt={post.title}
@@ -331,47 +412,48 @@ export default function BlogPage() {
                           onError={() => handleImageError(post.id)}
                           loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </div>
 
                       {/* Content Section */}
-                      <div className="w-2/3 p-6 xl:p-8 flex flex-col justify-center">
-                        <div className="space-y-4">
+                      <div className="p-4 sm:p-6">
+                        <div className="space-y-3">
                           {/* Category Badge */}
-                          <span className="inline-flex items-center w-fit px-3 py-1.5 bg-red-50 text-red-600 rounded-full text-sm font-medium">
-                            <Tag className="w-3 h-3 mr-2" />
+                          <span className="inline-flex items-center w-fit px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-medium">
+                            <Tag className="w-3 h-3 mr-1" />
                             {post.category}
                           </span>
 
                           {/* Title */}
-                          <h3 className="text-xl xl:text-2xl font-bold text-gray-900 leading-tight group-hover:text-red-600 transition-colors duration-200">
+                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight group-hover:text-red-600 transition-colors duration-200">
                             {post.title}
                           </h3>
 
                           {/* Excerpt */}
-                          <p className="text-gray-600 leading-relaxed text-sm xl:text-base">
-                            {post.excerpt}
+                          <p className="text-gray-600 leading-relaxed text-sm">
+                            {post.excerpt.length > 120 ? post.excerpt.substring(0, 120) + '...' : post.excerpt}
                           </p>
 
-                          {/* Meta Info and Read More */}
-                          <div className="flex items-center justify-between pt-2">
-                            <div className="flex items-center gap-4 xl:gap-6 text-sm text-gray-500">
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-4 w-4 text-red-600" />
-                                <span>{formatDate(post.publishedAt)}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-4 w-4 text-red-600" />
-                                <span>{post.readTime}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <User className="h-4 w-4 text-red-600" />
-                                <span>{post.author}</span>
-                              </div>
+                          {/* Meta Info */}
+                          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3 text-red-600" />
+                              <span>{formatDate(post.publishedAt)}</span>
                             </div>
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3 text-red-600" />
+                              <span>{post.readTime}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <User className="h-3 w-3 text-red-600" />
+                              <span>{post.author}</span>
+                            </div>
+                          </div>
 
+                          {/* Read More Button */}
+                          <div className="pt-2">
                             <button
-                              className="inline-flex items-center text-red-600 hover:text-red-800 font-semibold text-sm xl:text-base transition-colors duration-200"
+                              className="inline-flex items-center text-red-600 hover:text-red-800 font-semibold text-sm transition-colors duration-200"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleReadMore(post);
@@ -384,10 +466,80 @@ export default function BlogPage() {
                         </div>
                       </div>
                     </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+
+                    {/* Desktop Layout: Horizontal */}
+                    <div className="hidden lg:block">
+                      <div className="flex h-64 xl:h-72">
+                        {/* Image Section */}
+                        <div className="w-1/3 relative overflow-hidden">
+                          <img 
+                            src={getImageSrc(post)}
+                            alt={post.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={() => handleImageError(post.id)}
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+
+                        {/* Content Section */}
+                        <div className="w-2/3 p-6 xl:p-8 flex flex-col justify-center">
+                          <div className="space-y-4">
+                            {/* Category Badge */}
+                            <span className="inline-flex items-center w-fit px-3 py-1.5 bg-red-50 text-red-600 rounded-full text-sm font-medium">
+                              <Tag className="w-3 h-3 mr-2" />
+                              {post.category}
+                            </span>
+
+                            {/* Title */}
+                            <h3 className="text-xl xl:text-2xl font-bold text-gray-900 leading-tight group-hover:text-red-600 transition-colors duration-200">
+                              {post.title}
+                            </h3>
+
+                            {/* Excerpt */}
+                            <p className="text-gray-600 leading-relaxed text-sm xl:text-base">
+                              {post.excerpt}
+                            </p>
+
+                            {/* Meta Info and Read More */}
+                            <div className="flex items-center justify-between pt-2">
+                              <div className="flex items-center gap-4 xl:gap-6 text-sm text-gray-500">
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="h-4 w-4 text-red-600" />
+                                  <span>{formatDate(post.publishedAt)}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-4 w-4 text-red-600" />
+                                  <span>{post.readTime}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <User className="h-4 w-4 text-red-600" />
+                                  <span>{post.author}</span>
+                                </div>
+                              </div>
+
+                              <button
+                                className="inline-flex items-center text-red-600 hover:text-red-800 font-semibold text-sm xl:text-base transition-colors duration-200"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleReadMore(post);
+                                }}
+                              >
+                                Read More
+                                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              <PaginationControls />
+            </>
           )}
 
           {/* No Results */}
@@ -398,7 +550,10 @@ export default function BlogPage() {
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No articles found</h3>
               <p className="text-gray-600 mb-4 px-4">
-                Try adjusting your search terms or selecting a different category.
+                {searchTerm ? 
+                  "Try adjusting your search terms or selecting a different category." :
+                  "No articles available for this category."
+                }
               </p>
               <button
                 className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200"

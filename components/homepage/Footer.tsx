@@ -77,7 +77,27 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-background/20 mt-8 sm:mt-10 lg:mt-12 pt-4 sm:pt-6 text-center text-background/70 text-xs sm:text-sm">
-          <p>© 2024 Hamaza Gym. All rights reserved.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-2">
+            <p>© 2024 Hamaza Gym. All rights reserved.</p>
+            <div className="flex items-center gap-4">
+              <a 
+                href="/terms-of-use" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-accent hover:underline font-medium"
+              >
+                Terms of Use
+              </a>
+              <a 
+                href="/privacy-policy" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-accent hover:underline font-medium"
+              >
+                Privacy Policy
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

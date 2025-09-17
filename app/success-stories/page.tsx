@@ -1,7 +1,7 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Eye, EyeOff, Loader2, Trophy, Users, Star, RefreshCw } from "lucide-react"
+import { ArrowRight, Eye, EyeOff, Loader2, Trophy, Users, Star, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import StrategySession from "@/components/homepage/StrategySession"
@@ -28,42 +28,87 @@ interface SuccessStory {
   createdAt: string
 }
 
+interface PaginationInfo {
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+  limit: number
+}
+
 interface SuccessStoriesApiResponse {
-  stories?: SuccessStory[]
+  stories: SuccessStory[]
+  pagination: PaginationInfo
   error?: string
 }
 
 export default function ElegantSuccessStories() {
   const [revealedStories, setRevealedStories] = useState<RevealedStories>({})
   const [stories, setStories] = useState<SuccessStory[]>([])
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+    limit: 2
+  })
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-
-  useEffect(() => {
-    fetchSuccessStories()
-  }, [])
-
-  const fetchSuccessStories = async () => {
+  const fetchSuccessStories = useCallback(async (page: number = 1, append: boolean = false) => {
     try {
-      setLoading(true)
+      if (page === 1) {
+        setLoading(true)
+      } else {
+        setLoadingMore(true)
+      }
       setError(null)
       
-      const response = await fetch('/api/success-stories')
+      const response = await fetch(`/api/success-stories?page=${page}&limit=3`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       
-      const data: SuccessStory[] = await response.json()
-      setStories(data)
+      const data: SuccessStoriesApiResponse = await response.json()
+      
+      if (append && page > 1) {
+        setStories(prev => [...prev, ...data.stories])
+      } else {
+        setStories(data.stories)
+      }
+      setPagination(data.pagination)
       
     } catch (err) {
       console.error('Error fetching success stories:', err)
       setError('Failed to load success stories. Please try again later.')
-    
     } finally {
       setLoading(false)
+      setLoadingMore(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchSuccessStories(1, false)
+  }, [fetchSuccessStories])
+
+  const loadMoreStories = () => {
+    if (pagination.hasNextPage && !loadingMore) {
+      fetchSuccessStories(pagination.currentPage + 1, true)
+    }
+  }
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= pagination.totalPages && !loading) {
+      fetchSuccessStories(page, false)
+      // Scroll to top of stories section
+      const element = document.getElementById('stories-section')
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' })
+      }
     }
   }
 
@@ -84,6 +129,7 @@ export default function ElegantSuccessStories() {
             <div className="h-12 md:h-16 lg:h-20 bg-gray-200 rounded-lg mb-4 md:mb-6 mx-auto w-3/4"></div>
             <div className="h-6 md:h-8 bg-gray-100 rounded mb-6 md:mb-8 mx-auto w-2/3"></div>
           </div>
+
         </div>
       </section>
 
@@ -91,9 +137,9 @@ export default function ElegantSuccessStories() {
       <section className="py-8 md:py-12 lg:py-16">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="space-y-8 md:space-y-12 lg:space-y-16">
-            {[1, 2, 3].map((index) => (
+            {[1, 2,3].map((index) => (
               <div key={index} className="animate-pulse">
-                <div className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-6 md:gap-8 lg:gap-12`}>
+                <div className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-6 md:gap-8 lg:gap-12`}>
                   
                   {/* Image Skeleton */}
                   <div className="w-full lg:w-1/2">
@@ -126,6 +172,139 @@ export default function ElegantSuccessStories() {
     </div>
   )
 
+  // Enhanced Pagination Component with better visibility
+  const PaginationControls = () => {
+    if (pagination.totalCount === 0) return null;
+    
+    return (
+      <div className="flex flex-col items-center gap-6 py-8 border-t border-slate-200 mt-8">
+        {/* Page Info */}
+        <div className="text-sm text-slate-600">
+          Showing page {pagination.currentPage} of {pagination.totalPages} 
+          ({pagination.totalCount} total stories)
+        </div>
+
+        {/* Pagination Buttons */}
+        <div className="flex items-center gap-2">
+          {/* Previous Button */}
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => goToPage(pagination.currentPage - 1)}
+            disabled={!pagination.hasPrevPage || loading}
+            className="flex items-center gap-2 px-4 py-2"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Previous
+          </Button>
+
+          {/* Page Numbers */}
+          <div className="flex items-center gap-1 mx-4">
+            {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+              let pageNum;
+              if (pagination.totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (pagination.currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (pagination.currentPage >= pagination.totalPages - 2) {
+                pageNum = pagination.totalPages - 4 + i;
+              } else {
+                pageNum = pagination.currentPage - 2 + i;
+              }
+
+              return (
+                <Button
+                  key={pageNum}
+                  variant={pageNum === pagination.currentPage ? "default" : "outline"}
+                  size="default"
+                  onClick={() => goToPage(pageNum)}
+                  disabled={loading}
+                  className="w-10 h-10 p-0 font-medium"
+                >
+                  {pageNum}
+                </Button>
+              );
+            })}
+          </div>
+
+          {/* Next Button */}
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => goToPage(pagination.currentPage + 1)}
+            disabled={!pagination.hasNextPage || loading}
+            className="flex items-center gap-2 px-4 py-2"
+          >
+            Next
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Quick Jump (for many pages) */}
+        {pagination.totalPages > 5 && (
+          <div className="flex items-center gap-4 text-sm text-slate-600">
+            <span>Quick jump:</span>
+            <div className="flex gap-1">
+              {pagination.currentPage > 3 && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => goToPage(1)}
+                    disabled={loading}
+                    className="text-xs"
+                  >
+                    First
+                  </Button>
+                  {pagination.currentPage > 4 && <span className="px-1">...</span>}
+                </>
+              )}
+              
+              {pagination.currentPage < pagination.totalPages - 2 && (
+                <>
+                  {pagination.currentPage < pagination.totalPages - 3 && <span className="px-1">...</span>}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => goToPage(pagination.totalPages)}
+                    disabled={loading}
+                    className="text-xs"
+                  >
+                    Last
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Load More Button Component (Alternative approach)
+  const LoadMoreButton = () => (
+    <div className="flex justify-center py-8">
+      <Button
+        onClick={loadMoreStories}
+        disabled={!pagination.hasNextPage || loadingMore}
+        className="bg-slate-900 hover:bg-slate-800 px-8 py-3"
+        size="lg"
+      >
+        {loadingMore ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Loading more stories...
+          </>
+        ) : (
+          <>
+            Load More Stories
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </>
+        )}
+      </Button>
+    </div>
+  )
+
   // Error State Component
   const ErrorState = () => (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
@@ -140,7 +319,7 @@ export default function ElegantSuccessStories() {
           <p className="text-slate-600 mb-6">{error}</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button 
-              onClick={fetchSuccessStories}
+              onClick={() => fetchSuccessStories(1, false)}
               className="bg-slate-900 hover:bg-slate-800"
               disabled={loading}
             >
@@ -163,9 +342,6 @@ export default function ElegantSuccessStories() {
             </Link>
           </div>
         </div>
-        <p className="text-sm text-slate-500">
-          Don't worry, we've loaded some example stories to show you what's possible!
-        </p>
       </div>
     </div>
   )
@@ -212,7 +388,7 @@ export default function ElegantSuccessStories() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-                onClick={fetchSuccessStories}
+                onClick={() => fetchSuccessStories(1, false)}
                 className="bg-slate-900 hover:bg-slate-800"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
@@ -231,7 +407,7 @@ export default function ElegantSuccessStories() {
   )
 
   // Loading state
-  if (loading) {
+  if (loading && stories.length === 0) {
     return <LoadingSkeleton />
   }
 
@@ -257,13 +433,13 @@ export default function ElegantSuccessStories() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
                 <span className="text-sm text-yellow-800">
-                  Showing example stories due to connection issues
+                  Connection issues detected - some features may be limited
                 </span>
               </div>
               <Button 
                 size="sm" 
                 variant="outline" 
-                onClick={fetchSuccessStories}
+                onClick={() => fetchSuccessStories(1, false)}
                 className="text-yellow-800 border-yellow-300 hover:bg-yellow-100"
               >
                 <RefreshCw className="w-3 h-3 mr-1" />
@@ -289,7 +465,7 @@ export default function ElegantSuccessStories() {
           <div className="flex justify-center gap-8 text-sm text-slate-600 mb-6">
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-accent" />
-              <span>{stories.length} Transformations</span>
+              <span>{pagination.totalCount} Transformations</span>
             </div>
             <div className="flex items-center gap-2">
               <Star className="w-4 h-4 text-accent" />
@@ -304,7 +480,7 @@ export default function ElegantSuccessStories() {
       </section>
 
       {/* Transformations in Rows */}
-      <section className="py-8 md:py-12 lg:py-16">
+      <section id="stories-section" className="py-8 md:py-12 lg:py-16">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="space-y-8 md:space-y-12 lg:space-y-16">
             {stories.map((story, index) => (
@@ -444,6 +620,14 @@ export default function ElegantSuccessStories() {
               </div>
             ))}
           </div>
+
+          {/* Always Show Pagination Controls (even if only 1 page) */}
+          <PaginationControls />
+
+          {/* Alternative: Load More Button (uncomment to use instead of pagination) */}
+          {/* {pagination.hasNextPage && (
+            <LoadMoreButton />
+          )} */}
         </div>
       </section>
 
@@ -456,7 +640,7 @@ export default function ElegantSuccessStories() {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold mb-2">{stories.length}+</div>
+              <div className="text-3xl md:text-4xl font-bold mb-2">{pagination.totalCount}+</div>
               <div className="text-slate-300 text-sm md:text-base">Success Stories</div>
             </div>
             <div className="text-center">

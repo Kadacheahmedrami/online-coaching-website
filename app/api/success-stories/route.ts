@@ -7,7 +7,19 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const featured = searchParams.get('featured');
-    const limit = searchParams.get('limit');
+    const limit = parseInt(searchParams.get('limit') || '3');
+    const page = parseInt(searchParams.get('page') || '1');
+    
+    // Calculate offset for pagination
+    const skip = (page - 1) * limit;
+    
+    // Get total count for pagination info
+    const totalCount = await prisma.successStory.count({
+      where: {
+        published: true,
+        ...(featured === 'true' && { featured: true })
+      }
+    });
     
     const stories = await prisma.successStory.findMany({
       where: {
@@ -35,10 +47,26 @@ export async function GET(request: NextRequest) {
         { featured: 'desc' },
         { createdAt: 'desc' }
       ],
-      ...(limit && { take: parseInt(limit) })
+      skip,
+      take: limit
     });
 
-    return NextResponse.json(stories);
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return NextResponse.json({
+      stories,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        hasNextPage,
+        hasPrevPage,
+        limit
+      }
+    });
 
   } catch (error) {
     console.error('Error fetching success stories:', error);
