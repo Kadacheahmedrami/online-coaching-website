@@ -1,58 +1,57 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Instagram, MessageCircle, Mail, X } from "lucide-react"
-import { useState } from "react"
+
+type Contact = {
+  id: number
+  type: "INSTAGRAM" | "WHATSAPP" | "EMAIL"
+  title: string
+  info: string[]
+  url: string
+}
+
+const iconMap: Record<Contact["type"], any> = {
+  INSTAGRAM: Instagram,
+  WHATSAPP: MessageCircle,
+  EMAIL: Mail,
+}
+
+// Style map to restore Instagram gradient, WhatsApp green, Email red
+const styleMap: Record<Contact["type"], { bg: string; color: string }> = {
+  INSTAGRAM: {
+    bg: "bg-gradient-to-br from-purple-600 via-pink-600 to-yellow-500",
+    color: "text-white",
+  },
+  WHATSAPP: {
+    bg: "bg-green-500",
+    color: "text-white",
+  },
+  EMAIL: {
+    bg: "bg-red-500",
+    color: "text-white",
+  },
+}
 
 export default function ContactSection() {
   const [showPopup, setShowPopup] = useState(false)
+  const [contacts, setContacts] = useState<Contact[]>([])
 
-  const contactMethods = [
-    {
-      icon: Instagram,
-      iconBg: "bg-gradient-to-br from-purple-600 via-pink-600 to-yellow-500",
-      iconColor: "text-white",
-      title: "Instagram",
-      info: ["@hamazagym", "Follow for daily motivation", "and workout tips"]
-    },
-    {
-      icon: MessageCircle,
-      iconBg: "bg-green-500",
-      iconColor: "text-white",
-      title: "WhatsApp",
-      info: ["+1 (555) 123-4567", "Mon-Fri: 6AM - 10PM", "Sat-Sun: 7AM - 8PM"]
-    },
-    {
-      icon: Mail,
-      iconBg: "bg-red-500",
-      iconColor: "text-white",
-      title: "Email",
-      info: ["hello@hamazagym.com", "support@hamazagym.com", "We reply within 24 hours"]
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const res = await fetch("/api/contacts")
+        const data = await res.json()
+        setContacts(data.contacts)
+      } catch (error) {
+        console.error("Error fetching contacts:", error)
+      }
     }
-  ]
 
-  const popupOptions = [
-    {
-      icon: MessageCircle,
-      title: "WhatsApp",
-      subtitle: "Chat with us instantly",
-      color: "bg-green-500 hover:bg-green-600",
-      action: () => window.open("https://wa.me/15551234567", "_blank")
-    },
-    {
-      icon: Mail,
-      title: "Email",
-      subtitle: "Send us a detailed message",
-      color: "bg-red-500 hover:bg-red-600",
-      action: () => window.open("mailto:hello@hamazagym.com", "_blank")
-    },
-    {
-      icon: Instagram,
-      title: "Instagram",
-      subtitle: "DM us on social media",
-      color: "bg-gradient-to-br from-purple-600 via-pink-600 to-yellow-500 hover:from-purple-700 hover:via-pink-700 hover:to-yellow-600",
-      action: () => window.open("https://instagram.com/hamazagym", "_blank")
-    }
-  ]
+    fetchContacts()
+  }, [])
 
   return (
     <>
@@ -68,29 +67,37 @@ export default function ContactSection() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {contactMethods.map((method, index) => (
-              <Card key={index} className={`border border-border bg-card ${index === 2 ? 'md:col-span-2 lg:col-span-1' : ''}`}>
-                <CardContent className="p-6 text-center">
-                  <div className={`w-12 h-12 ${method.iconBg} rounded-xl flex items-center justify-center mx-auto mb-4`}>
-                    <method.icon className={`h-6 w-6 ${method.iconColor}`} />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2 text-card-foreground">{method.title}</h3>
-                  <p className="text-muted-foreground text-sm">
-                    {method.info.map((line, lineIndex) => (
-                      <span key={lineIndex}>
-                        {line}
-                        {lineIndex < method.info.length - 1 && <br />}
-                      </span>
-                    ))}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+            {contacts.map((contact, index) => {
+              const Icon = iconMap[contact.type]
+              const style = styleMap[contact.type]
+
+              return (
+                <Card
+                  key={contact.id}
+                  className={`border border-border bg-card ${index === 2 ? "md:col-span-2 lg:col-span-1" : ""}`}
+                >
+                  <CardContent className="p-6 text-center">
+                    <div className={`w-12 h-12 ${style.bg} rounded-xl flex items-center justify-center mx-auto mb-4`}>
+                      <Icon className={`h-6 w-6 ${style.color}`} />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 text-card-foreground">{contact.title}</h3>
+                    <p className="text-muted-foreground text-sm">
+                      {contact.info.map((line, lineIndex) => (
+                        <span key={lineIndex}>
+                          {line}
+                          {lineIndex < contact.info.length - 1 && <br />}
+                        </span>
+                      ))}
+                    </p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
 
           <div className="text-center mt-8">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="!bg-black cursor-pointer !text-white hover:!bg-accent"
               onClick={() => setShowPopup(true)}
             >
@@ -112,31 +119,36 @@ export default function ContactSection() {
                 </h3>
                 <button
                   onClick={() => setShowPopup(false)}
-                  className="p-2 rounded-full  hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <X className="h-5 w-5 text-gray-500" />
                 </button>
               </div>
-              
+
               <div className="space-y-3">
-                {popupOptions.map((option, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      option.action()
-                      setShowPopup(false)
-                    }}
-                    className={`w-full ${option.color} text-white rounded-xl p-4 flex items-center space-x-4 transition-all duration-200 transform hover:scale-105 hover:shadow-lg`}
-                  >
-                    <div className="bg-white/20 rounded-lg p-2">
-                      <option.icon className="h-6 w-6" />
-                    </div>
-                    <div className="text-left">
-                      <div className="font-semibold">{option.title}</div>
-                      <div className="text-sm opacity-90">{option.subtitle}</div>
-                    </div>
-                  </button>
-                ))}
+                {contacts.map((contact) => {
+                  const Icon = iconMap[contact.type]
+                  const style = styleMap[contact.type]
+
+                  return (
+                    <button
+                      key={contact.id}
+                      onClick={() => {
+                        window.open(contact.url, "_blank")
+                        setShowPopup(false)
+                      }}
+                      className={`w-full ${style.bg} text-white rounded-xl p-4 flex items-center space-x-4 transition-all duration-200 transform hover:scale-105 hover:shadow-lg`}
+                    >
+                      <div className="bg-white/20 rounded-lg p-2">
+                        <Icon className="h-6 w-6" />
+                      </div>
+                      <div className="text-left">
+                        <div className="font-semibold">{contact.title}</div>
+                        <div className="text-sm opacity-90">Contact us via {contact.type}</div>
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </div>

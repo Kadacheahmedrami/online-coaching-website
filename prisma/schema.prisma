@@ -151,3 +151,22 @@ model FreeResource {
 
   @@map("free_resources")
 }
+
+
+
+
+// contact 
+
+enum ContactType {
+  INSTAGRAM
+  WHATSAPP
+  EMAIL
+}
+
+model Contact {
+  id    Int         @id @default(autoincrement())
+  type  ContactType
+  title String
+  info  String[]    // requires Postgres
+  url   String
+}
