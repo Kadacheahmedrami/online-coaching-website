@@ -20,6 +20,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'res.cloudinary.com', // ✅ Cloudinary
       },
+      {
+        protocol: 'https',
+        hostname: 'hamza-sport.vercel.app', // ✅ Cloudinary
+      },
+      {
+        protocol: 'https',
+        hostname: 'hamza-sport-admin.vercel.app', // ✅ Cloudinary
+      },
     ],
   },
 }

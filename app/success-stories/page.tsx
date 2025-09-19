@@ -118,6 +118,7 @@ export default function ElegantSuccessStories() {
       [storyId]: !prev[storyId]
     }))
   }
+  
 
   // Loading Skeleton Component
   const LoadingSkeleton = () => (
