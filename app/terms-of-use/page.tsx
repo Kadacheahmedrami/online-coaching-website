@@ -282,8 +282,8 @@ export default function TermsOfUsePage() {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <h4 className="font-semibold mb-2">General Inquiries</h4>
-                      <p className="text-sm mb-1"><strong>Email:</strong> legal@hamazagym.com</p>
-                      <p className="text-sm mb-1"><strong>Phone:</strong> +1 (555) 123-4567</p>
+                      <p className="text-sm mb-1"><strong>Email:</strong> maouchahamza@gmail.com</p>
+                    
                     </div>
                     <div>
                       <h4 className="font-semibold mb-2">Business Hours</h4>

@@ -418,12 +418,11 @@ export default function PrivacyPolicyPage() {
                   <div className="grid md:grid-cols-3 gap-4">
                     <div>
                       <h4 className="font-semibold mb-2">Privacy Questions</h4>
-                      <p className="text-sm mb-1"><strong>Email:</strong> privacy@hamazagym.com</p>
-                      <p className="text-sm mb-1"><strong>Phone:</strong> +1 (555) 123-4567</p>
+                      <p className="text-sm mb-1"><strong>Email:</strong> maouchahamza@gmail.com</p>
                     </div>
                     <div>
                       <h4 className="font-semibold mb-2">Data Requests</h4>
-                      <p className="text-sm mb-1"><strong>Email:</strong> datarequest@hamazagym.com</p>
+                      <p className="text-sm mb-1"><strong>Email:</strong> maouchahamza@gmail.com</p>
                       <p className="text-sm">Include full name and email used in consultation</p>
                     </div>
                     <div>

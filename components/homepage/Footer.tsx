@@ -68,10 +68,9 @@ export default function Footer() {
           <div>
             <h4 className="font-medium mb-3 text-sm sm:text-base">Contact</h4>
             <div className="space-y-2 text-background/70 text-sm">
-              <p>@hamazagym</p>
-              <p>Follow on Instagram</p>
-              <p className="hover:text-accent transition-colors cursor-pointer">WhatsApp: +1 (555) 123-4567</p>
-              <p className="hover:text-accent transition-colors cursor-pointer">hello@hamazagym.com</p>
+           
+              
+              <p className="hover:text-accent transition-colors cursor-pointer">maouchahamza@gmail.com</p>
             </div>
           </div>
         </div>
